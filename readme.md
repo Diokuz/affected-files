@@ -19,4 +19,5 @@ const affected = getAffected(pattern, options)
 where
 
 `pattern` (optional) – glob pattern of your source files, `./src/**/*.js` by default.
+
 `options.changed` (optional) – an array of changed files paths. By default it is evaluated from git diff relative to origin/master, but you could define custom _changed_ array.
