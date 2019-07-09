@@ -4,6 +4,8 @@ Returns a list of files, which affected in current branch compared to target bra
 
 Lets say you have a repo with files `a.js`, `b.js`, `c.js` and `d.js`. Let `a.js` and `b.js` be dependent from `d.js`. If `d.js` was changed in your merge request, files `a.js` and `b.js` also _affected_. So, `affected-files` will return you an array of `[ 'a.js', 'b.js', 'd.js' ]`.
 
+> note: removed files are not considered, since it breaks a require chain.
+
 ## Extensions
 
 `.js`, `.jsx`, `.ts`, `.tsx` are supported. Other extensions not yet.

@@ -22,7 +22,7 @@ function getChanged() {
         .filter((s) => s.length);
     const changed = staged.concat(comitted).map((f) => path.resolve(f));
     log('changed', changed);
-    return changed;
+    return changed.filter(f => fs.existsSync(f));
 }
 function getAffectedFiles(pattern = './src/**/*', options = {}) {
     const changed = options.changed || getChanged();

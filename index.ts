@@ -32,7 +32,7 @@ function getChanged(): string[] {
 
   log('changed', changed)
 
-  return changed
+  return changed.filter(f => fs.existsSync(f))
 }
 
 function getAffectedFiles(pattern: string = './src/**/*', options: Options = {}): string[] {
