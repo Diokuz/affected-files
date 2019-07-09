@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "target": "es2015",
+    "lib": ["es2015"],
+    "rootDir": "./",
+    "moduleResolution": "Node",
+    "module": "CommonJS",
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "sourceMap": true,
+    "jsx": "react",
+    "declaration": true,
+    "resolveJsonModule": true,
+    "strictNullChecks": true,
+    "importHelpers": true,
+    "downlevelIteration": true,
+    "noImplicitAny": true
+  },
+  "exclude": [
+    "./__tests__/**/*"
+  ]
+}
