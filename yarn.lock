@@ -1265,10 +1265,10 @@ fill-range@^4.0.0:
     repeat-string "^1.6.1"
     to-regex-range "^2.1.0"
 
-filter-dependent@^1.1.4:
-  version "1.1.4"
-  resolved "https://registry.yarnpkg.com/filter-dependent/-/filter-dependent-1.1.4.tgz#083bd2dbae7d59da1dcf0ad7868679319b58c0da"
-  integrity sha512-cL4mZTSxO+h+rRdOeM+npNYGzIsQ21bI3O1lOvJ9u7bBEmaCcggwCO8tLklYYeP+pyIyFhKP+xAYaABNzAd2fg==
+filter-dependent@^1.1.5:
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/filter-dependent/-/filter-dependent-1.1.5.tgz#521940703f01b571eda5a4b1115d94f3801a034c"
+  integrity sha512-r5ImIpX1yIQ6Otqvpi81yoLvmsrfcyxKdQBfGHBhBryomybphSQFcDnrhEl28idMnXgiWQN7vwrWky6I8+UtvQ==
   dependencies:
     "@types/node" "^12.0.12"
     filing-cabinet "^2.3.3"
