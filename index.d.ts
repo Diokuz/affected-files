@@ -7,6 +7,7 @@ declare const filterDependent: any;
 declare const log: any;
 declare type Options = {
     changed?: string[];
+    moduleDirectory?: string | ReadonlyArray<string>;
 };
 declare function getChanged(): string[];
 declare function getAffectedFiles(pattern?: string, options?: Options): string[];

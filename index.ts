@@ -8,7 +8,8 @@ const filterDependent = require('filter-dependent')
 const log = debug('af')
 
 type Options = {
-  changed?: string[]
+  changed?: string[],
+  moduleDirectory?: string | ReadonlyArray<string>
 }
 
 function getChanged(): string[] {
@@ -40,8 +41,10 @@ function getAffectedFiles(pattern: string = './src/**/*', options: Options = {})
   const sources = glob.sync(pattern)
 
   log('sources', sources)
-
-  const affectedFiles = filterDependent(sources, changed)
+  const { moduleDirectory } = options;
+  const affectedFiles = filterDependent(sources, changed, {
+    moduleDirectory
+  })
 
   log('affectedFiles', affectedFiles)
 

@@ -28,7 +28,10 @@ function getAffectedFiles(pattern = './src/**/*', options = {}) {
     const changed = options.changed || getChanged();
     const sources = glob.sync(pattern);
     log('sources', sources);
-    const affectedFiles = filterDependent(sources, changed);
+    const { moduleDirectory } = options;
+    const affectedFiles = filterDependent(sources, changed, {
+        moduleDirectory
+    });
     log('affectedFiles', affectedFiles);
     return affectedFiles;
 }
