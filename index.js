@@ -25,7 +25,11 @@ function getChanged() {
     return changed.filter(f => fs.existsSync(f));
 }
 function getAffectedFiles(pattern = './src/**/*', options = {}) {
+    if (options && options.changed) {
+        log('custom changed detected', options.changed);
+    }
     const changed = options.changed || getChanged();
+    log('pattern', pattern);
     const sources = glob.sync(pattern);
     log('sources', sources);
     const affectedFiles = filterDependent(sources, changed);

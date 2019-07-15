@@ -1,12 +1,15 @@
 {
   "name": "affected-files",
-  "version": "1.0.6",
+  "version": "1.1.0",
   "description": "Retrieves all files which are affected in current git branch",
   "author": "Diokuz",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git://github.com/diokuz/affected-files.git"
+  },
+  "scripts": {
+    "afiles": "bin/cli.js"
   },
   "devDependencies": {
     "debug": "^4.1.1",
@@ -16,6 +19,7 @@
   },
   "dependencies": {
     "filter-dependent": "^1.1.5",
-    "glob": "^7.1.4"
+    "glob": "^7.1.4",
+    "yargs": "^13.2.4"
   }
 }

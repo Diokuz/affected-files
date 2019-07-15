@@ -36,7 +36,14 @@ function getChanged(): string[] {
 }
 
 function getAffectedFiles(pattern: string = './src/**/*', options: Options = {}): string[] {
+  if (options && options.changed) {
+    log('custom changed detected', options.changed)
+  }
+
   const changed = options.changed || getChanged()
+
+  log('pattern', pattern)
+
   const sources = glob.sync(pattern)
 
   log('sources', sources)

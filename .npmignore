@@ -4,3 +4,6 @@
 jest.config.js
 Makefile
 tsconfig.json
+bin/cli.d.ts
+bin/cli.ts
+bin/cli.d.js.map
