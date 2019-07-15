@@ -1,0 +1,6 @@
+.editorconfig
+.gitignore
+.prettierrc.yml
+jest.config.js
+Makefile
+tsconfig.json

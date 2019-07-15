@@ -1,6 +1,6 @@
 {
   "name": "affected-files",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Retrieves all files which are affected in current git branch",
   "author": "Diokuz",
   "license": "MIT",
