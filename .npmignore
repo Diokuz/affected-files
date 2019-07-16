@@ -7,3 +7,4 @@ tsconfig.json
 bin/cli.d.ts
 bin/cli.ts
 bin/cli.d.js.map
+index.ts

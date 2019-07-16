@@ -10,11 +10,9 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "sourceMap": true,
-    "jsx": "react",
     "declaration": true,
     "resolveJsonModule": true,
     "strictNullChecks": true,
-    "importHelpers": true,
     "downlevelIteration": true,
     "noImplicitAny": true
   },

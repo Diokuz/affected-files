@@ -1,13 +1,7 @@
-declare const fs: any;
-declare const path: any;
-declare const execSync: any;
-declare const glob: any;
-declare const debug: any;
-declare const filterDependent: any;
-declare const log: any;
 declare type Options = {
     changed?: string[];
     abs?: boolean;
 };
-declare function getChanged(): string[];
+export declare const DEFAULT_PATTERN = "./src/**/*";
 declare function getAffectedFiles(pattern?: string, options?: Options): string[];
+export default getAffectedFiles;

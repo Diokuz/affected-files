@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-const getAffectedFiles = require('..')
+const getAffectedFiles = require('..').default
 
-const pattern = process.argv[2]
+const pattern = process.argv[2] || ''
 
 console.log('pattern: ', pattern)
 

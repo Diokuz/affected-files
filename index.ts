@@ -1,9 +1,9 @@
-const fs = require('fs')
-const path = require('path')
-const { execSync } = require('child_process')
-const glob = require('glob')
-const debug = require('debug')
-const filterDependent = require('filter-dependent')
+import fs from 'fs'
+import path from 'path'
+import { execSync } from 'child_process'
+import glob from 'glob'
+import debug from 'debug'
+import filterDependent from 'filter-dependent'
 
 const log = debug('af')
 
@@ -11,6 +11,8 @@ type Options = {
   changed?: string[],
   abs?: boolean,
 }
+
+export const DEFAULT_PATTERN = './src/**/*'
 
 function getChanged(): string[] {
   const staged = String(execSync('git diff --name-only --pretty=format: HEAD'))
@@ -37,7 +39,7 @@ function getChanged(): string[] {
 }
 
 
-function getAffectedFiles(pattern: string = './src/**/*', options: Options = {}): string[] {
+function getAffectedFiles(pattern: string = DEFAULT_PATTERN, options: Options = {}): string[] {
   if (options && options.changed) {
     log('custom changed detected', options.changed)
   }
@@ -62,4 +64,4 @@ function getAffectedFiles(pattern: string = './src/**/*', options: Options = {})
   return affectedFiles.map((f: string) => f.slice(process.cwd().length + 1))
 }
 
-module.exports = getAffectedFiles
+export default getAffectedFiles
