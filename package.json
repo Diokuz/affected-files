@@ -1,6 +1,6 @@
 {
   "name": "affected-files",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Retrieves all files which affected in current git branch",
   "author": "Diokuz",
   "license": "MIT",
@@ -8,8 +8,11 @@
     "type": "git",
     "url": "git://github.com/diokuz/affected-files.git"
   },
+  "bin": {
+    "afiles": "./bin/cli.js"
+  },
   "scripts": {
-    "afiles": "bin/cli.js"
+    "afiles": "./bin/cli.js"
   },
   "devDependencies": {
     "debug": "^4.1.1",
@@ -19,7 +22,6 @@
   },
   "dependencies": {
     "filter-dependent": "^1.1.6",
-    "glob": "^7.1.4",
-    "yargs": "^13.3.0"
+    "glob": "^7.1.4"
   }
 }

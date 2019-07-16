@@ -36,6 +36,7 @@ function getChanged(): string[] {
   return changed.filter(f => fs.existsSync(f))
 }
 
+
 function getAffectedFiles(pattern: string = './src/**/*', options: Options = {}): string[] {
   if (options && options.changed) {
     log('custom changed detected', options.changed)

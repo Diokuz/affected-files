@@ -40,3 +40,16 @@ where
 `options` (optional)
 
 `options.changed` (optional) – an array of changed files paths. By default it is evaluated from git diff relative to origin/master, but you could define custom _changed_ array.
+
+## CLI
+
+```sh
+$ yarn afiles 'src/**/*.js'
+
+pattern:  *.*
+Affected files:
+index.ts
+package.json
+readme.md
+yarn.lock
+```
