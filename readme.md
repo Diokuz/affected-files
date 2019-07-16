@@ -53,3 +53,12 @@ package.json
 readme.md
 yarn.lock
 ```
+
+## Using in CI
+
+1. `affected-files` uses git, so, be sure, git is available in docker image
+2. `affected-files` uses origin/master revision to compare, so, be sure a) origin/master is exists on runner b) origin/master is up to date.
+
+`git fetch && git rev-parse origin/master` – that cmd resolves all problems, or fail otherwise. Use it before using `affected-files`.
+
+If git is not available only on some docker images, you could save affected list to file and use it everywhere in CI via [artifacts](https://docs.gitlab.com/ee/user/project/pipelines/job_artifacts.html).
