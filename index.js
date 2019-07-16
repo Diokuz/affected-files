@@ -34,7 +34,11 @@ function getAffectedFiles(pattern = './src/**/*', options = {}) {
     log('sources', sources);
     const affectedFiles = filterDependent(sources, changed);
     log('affectedFiles', affectedFiles);
-    return affectedFiles;
+    if (options.abs === true) {
+        return affectedFiles;
+    }
+    // /abs/path/to/cwd/folder/1.js → folder/1.js
+    return affectedFiles.map((f) => f.slice(process.cwd().length + 1));
 }
 module.exports = getAffectedFiles;
 //# sourceMappingURL=index.js.map

@@ -1,7 +1,7 @@
 {
   "name": "affected-files",
-  "version": "1.1.1",
-  "description": "Retrieves all files which are affected in current git branch",
+  "version": "2.0.0",
+  "description": "Retrieves all files which affected in current git branch",
   "author": "Diokuz",
   "license": "MIT",
   "repository": {
@@ -18,8 +18,8 @@
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
-    "filter-dependent": "^1.1.5",
+    "filter-dependent": "^1.1.6",
     "glob": "^7.1.4",
-    "yargs": "^13.2.4"
+    "yargs": "^13.3.0"
   }
 }

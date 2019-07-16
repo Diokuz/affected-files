@@ -8,7 +8,8 @@ const filterDependent = require('filter-dependent')
 const log = debug('af')
 
 type Options = {
-  changed?: string[]
+  changed?: string[],
+  abs?: boolean,
 }
 
 function getChanged(): string[] {
@@ -52,7 +53,12 @@ function getAffectedFiles(pattern: string = './src/**/*', options: Options = {})
 
   log('affectedFiles', affectedFiles)
 
-  return affectedFiles
+  if (options.abs === true) {
+    return affectedFiles
+  }
+
+  // /abs/path/to/cwd/folder/1.js → folder/1.js
+  return affectedFiles.map((f: string) => f.slice(process.cwd().length + 1))
 }
 
 module.exports = getAffectedFiles
