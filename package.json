@@ -1,6 +1,6 @@
 {
   "name": "affected-files",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "Retrieves all files which affected in current git branch",
   "author": "Diokuz",
   "license": "MIT",
@@ -17,7 +17,7 @@
   "devDependencies": {
     "@types/debug": "^4.1.4",
     "@types/glob": "^7.1.1",
-    "@types/node": "^12.6.3",
+    "@types/node": "^12.6.8",
     "debug": "^4.1.1",
     "jest": "^24.8.0",
     "prettier": "1.18.2",

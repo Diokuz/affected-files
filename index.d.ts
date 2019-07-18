@@ -1,6 +1,9 @@
+declare type Filename = string;
+declare type GlobPattern = string;
 declare type Options = {
-    changed?: string[];
+    changed?: Filename[];
     abs?: boolean;
+    superleaves?: GlobPattern[];
 };
 export declare const DEFAULT_PATTERN = "./src/**/*";
 declare function getAffectedFiles(pattern?: string, options?: Options): string[];

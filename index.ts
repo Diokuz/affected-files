@@ -7,14 +7,23 @@ import filterDependent from 'filter-dependent'
 
 const log = debug('af')
 
+type Filename = string
+type GlobPattern = string
+
 type Options = {
-  changed?: string[],
+  changed?: Filename[],
   abs?: boolean,
+  superleaves?: GlobPattern[],
 }
 
 export const DEFAULT_PATTERN = './src/**/*'
 
-function getChanged(): string[] {
+function getChanged(argChanged?: Filename[]): string[] {
+  if (argChanged) {
+    // to abs path
+    return argChanged.map((f) => path.resolve(f))
+  }
+
   const staged = String(execSync('git diff --name-only --pretty=format: HEAD'))
     .trim()
     .split('\n')
@@ -40,11 +49,11 @@ function getChanged(): string[] {
 
 
 function getAffectedFiles(pattern: string = DEFAULT_PATTERN, options: Options = {}): string[] {
-  if (options && options.changed) {
+  if (options.changed) {
     log('custom changed detected', options.changed)
   }
 
-  const changed = options.changed || getChanged()
+  const changed = getChanged(options.changed)
 
   log('pattern', pattern)
 
@@ -55,6 +64,31 @@ function getAffectedFiles(pattern: string = DEFAULT_PATTERN, options: Options = 
   const affectedFiles = filterDependent(sources, changed)
 
   log('affectedFiles', affectedFiles)
+
+  if (options.superleaves) {
+    log('superleaves detected', options.superleaves)
+
+    const superfiles = options.superleaves.reduce((acc: string[], sl: GlobPattern) => {
+      const lfiles = glob.sync(sl, { absolute: true })
+
+      acc = acc.concat(lfiles)
+
+      return acc
+    }, [])
+
+    const superfilesSet = new Set(superfiles)
+    const affectedSet = new Set(affectedFiles)
+
+    for (let fn of superfilesSet) {
+      if (affectedSet.has(fn)) {
+        log(`Superleaf "${fn}" is affected, returning all files`, options.superleaves)
+
+        return glob.sync(pattern, { absolute: options.abs })
+      }
+    }
+
+    log(`Superleaves not affected, returning only affected files`)
+  }
 
   if (options.abs === true) {
     return affectedFiles
