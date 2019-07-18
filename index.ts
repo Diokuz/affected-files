@@ -61,7 +61,8 @@ function getAffectedFiles(pattern: string = DEFAULT_PATTERN, options: Options = 
 
   log('sources', sources)
 
-  const affectedFiles = filterDependent(sources, changed)
+  const affectedOnlyFiles = filterDependent(sources, changed)
+  const affectedFiles = Array.from(new Set(changed.concat(affectedOnlyFiles)))
 
   log('affectedFiles', affectedFiles)
 
@@ -75,6 +76,8 @@ function getAffectedFiles(pattern: string = DEFAULT_PATTERN, options: Options = 
 
       return acc
     }, [])
+
+    log('superfiles', superfiles)
 
     const superfilesSet = new Set(superfiles)
     const affectedSet = new Set(affectedFiles)

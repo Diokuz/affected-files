@@ -41,6 +41,8 @@ where
 
 `options.changed` (optional) – an array of changed files paths. By default it is evaluated from git diff relative to origin/master, but you could define custom _changed_ array.
 
+`options.superleaves` (optional) – an array of glob patterns of files, which considered as superleaves. That means, every js/ts files in your repo is dependent from every superleaf. For example, you need to build full storybook every time you have changed something in `./.storybook`. Then just use `getAffected(pattern, { superleaves: '.storybook/*' })`.
+
 ## CLI
 
 ```sh

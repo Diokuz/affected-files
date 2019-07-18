@@ -42,7 +42,8 @@ function getAffectedFiles(pattern = exports.DEFAULT_PATTERN, options = {}) {
     log('pattern', pattern);
     const sources = glob_1.default.sync(pattern);
     log('sources', sources);
-    const affectedFiles = filter_dependent_1.default(sources, changed);
+    const affectedOnlyFiles = filter_dependent_1.default(sources, changed);
+    const affectedFiles = Array.from(new Set(changed.concat(affectedOnlyFiles)));
     log('affectedFiles', affectedFiles);
     if (options.superleaves) {
         log('superleaves detected', options.superleaves);
@@ -51,6 +52,7 @@ function getAffectedFiles(pattern = exports.DEFAULT_PATTERN, options = {}) {
             acc = acc.concat(lfiles);
             return acc;
         }, []);
+        log('superfiles', superfiles);
         const superfilesSet = new Set(superfiles);
         const affectedSet = new Set(affectedFiles);
         for (let fn of superfilesSet) {
