@@ -54,12 +54,11 @@ Place this file in cwd, and export your default options (including _pattern_).
 ```sh
 $ yarn afiles 'src/**/*.js'
 
-pattern:  *.*
+pattern:  src/**/*.js
 Affected files:
-index.ts
-package.json
-readme.md
-yarn.lock
+src/index.js
+src/foo.js
+src/bar.js
 ```
 
 ## Using in CI
