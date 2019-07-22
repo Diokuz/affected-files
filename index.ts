@@ -11,9 +11,9 @@ type Filename = string
 type GlobPattern = string
 
 type Options = {
-  changed?: Filename[],
-  abs?: boolean,
-  superleaves?: GlobPattern[],
+  changed?: Filename[]
+  abs?: boolean
+  superleaves?: GlobPattern[]
 }
 
 export const DEFAULT_PATTERN = './src/**/*'
@@ -44,9 +44,8 @@ function getChanged(argChanged?: Filename[]): string[] {
 
   log('changed', changed)
 
-  return changed.filter(f => fs.existsSync(f))
+  return changed.filter((f) => fs.existsSync(f))
 }
-
 
 function getAffectedFiles(pattern: string = DEFAULT_PATTERN, options: Options = {}): string[] {
   if (options.changed) {
@@ -61,8 +60,7 @@ function getAffectedFiles(pattern: string = DEFAULT_PATTERN, options: Options = 
 
   log('sources', sources)
 
-  const affectedOnlyFiles = filterDependent(sources, changed)
-  const affectedFiles = Array.from(new Set(changed.concat(affectedOnlyFiles)))
+  const affectedFiles = filterDependent(sources, changed)
 
   log('affectedFiles', affectedFiles)
 

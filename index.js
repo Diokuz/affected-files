@@ -32,7 +32,7 @@ function getChanged(argChanged) {
         .filter((s) => s.length);
     const changed = staged.concat(comitted).map((f) => path_1.default.resolve(f));
     log('changed', changed);
-    return changed.filter(f => fs_1.default.existsSync(f));
+    return changed.filter((f) => fs_1.default.existsSync(f));
 }
 function getAffectedFiles(pattern = exports.DEFAULT_PATTERN, options = {}) {
     if (options.changed) {
@@ -42,8 +42,7 @@ function getAffectedFiles(pattern = exports.DEFAULT_PATTERN, options = {}) {
     log('pattern', pattern);
     const sources = glob_1.default.sync(pattern);
     log('sources', sources);
-    const affectedOnlyFiles = filter_dependent_1.default(sources, changed);
-    const affectedFiles = Array.from(new Set(changed.concat(affectedOnlyFiles)));
+    const affectedFiles = filter_dependent_1.default(sources, changed);
     log('affectedFiles', affectedFiles);
     if (options.superleaves) {
         log('superleaves detected', options.superleaves);
