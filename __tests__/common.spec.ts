@@ -67,3 +67,16 @@ describe('Superleaves', () => {
     expect(() => af('foo/*.js', { changed: [], superleaves })).toThrow()
   })
 })
+
+describe('Config file', () => {
+  const fix = ['__tests__', '__fixtures__', 'config-file']
+  const cwd = path.resolve(process.cwd(), fix[0], fix[1], fix[2])
+
+  it('Must return affected files according to config pattern', () => {
+    const changed = [ path.resolve(cwd, 'changed.js') ]
+    const result = af({ changed, cwd })
+    expect(result).toEqual([
+      'affected.js',
+    ])
+  })
+})

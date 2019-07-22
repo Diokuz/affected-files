@@ -14,6 +14,7 @@ const log = debug_1.default('af');
 exports.DEFAULT_PATTERN = './src/**/*';
 const DEFAULT_OPTIONS = {
     absolute: false,
+    cwd: process.cwd(),
 };
 function getChanged(argChanged) {
     if (argChanged) {
@@ -38,27 +39,41 @@ function getChanged(argChanged) {
     log('changed', changed);
     return changed.filter((f) => fs_1.default.existsSync(f));
 }
-function getArgs(patternArg, optionsArg) {
+function getOptions(patternArg, optionsArg) {
     let pattern = exports.DEFAULT_PATTERN;
-    let options = optionsArg || DEFAULT_OPTIONS;
+    let realOptionsArg = optionsArg;
     if (typeof patternArg === 'object') {
-        options = patternArg;
+        realOptionsArg = patternArg;
         pattern = patternArg.pattern || exports.DEFAULT_PATTERN;
     }
     else {
         pattern = patternArg;
     }
-    return { pattern, options };
+    let options = Object.assign({ pattern }, DEFAULT_OPTIONS, realOptionsArg);
+    let fileOptions = {};
+    try {
+        const fn = path_1.default.resolve(options.cwd, 'affected-files.config.js');
+        fileOptions = require(fn);
+        log(`File config found`, fn, fileOptions);
+    }
+    catch (e) {
+        log(`No config file detected`);
+    }
+    options = Object.assign({ pattern }, DEFAULT_OPTIONS, fileOptions, realOptionsArg);
+    return options;
 }
-function getAffectedFiles(patternArg, optionsArg) {
-    const { pattern, options } = getArgs(patternArg, optionsArg);
-    const isAbs = options.abs || options.absolute || false;
+function publicGetAffectedFiles(patternArg, optionsArg) {
+    const options = getOptions(patternArg, optionsArg);
+    return getAffectedFiles(options);
+}
+function getAffectedFiles(options) {
+    const { pattern, absolute, cwd } = options;
     if (options.changed) {
         log('custom changed detected', options.changed);
     }
     const changed = getChanged(options.changed);
     log('pattern', pattern);
-    const sources = glob_1.default.sync(pattern);
+    const sources = glob_1.default.sync(pattern, { cwd, absolute: true });
     log('sources', sources);
     const affectedFiles = filter_dependent_1.default(sources, changed);
     log('affectedFiles', affectedFiles);
@@ -81,16 +96,16 @@ function getAffectedFiles(patternArg, optionsArg) {
         for (let fn of superfilesSet) {
             if (affectedSet.has(fn)) {
                 log(`Superleaf "${fn}" is affected, returning all files`, options.superleaves);
-                return glob_1.default.sync(pattern, { absolute: isAbs });
+                return glob_1.default.sync(pattern, { absolute });
             }
         }
         log(`Superleaves not affected, returning only affected files`);
     }
-    if (isAbs === true) {
+    if (absolute === true) {
         return affectedFiles;
     }
     // /abs/path/to/cwd/folder/1.js → folder/1.js
-    return affectedFiles.map((f) => f.slice(process.cwd().length + 1));
+    return affectedFiles.map((f) => f.slice(cwd.length + 1));
 }
-exports.default = getAffectedFiles;
+exports.default = publicGetAffectedFiles;
 //# sourceMappingURL=index.js.map

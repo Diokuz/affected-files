@@ -11,17 +11,24 @@ const log = debug('af')
 type Filename = string
 type GlobPattern = string
 
-type Options = {
+interface Options {
   pattern?: string
   changed?: Filename[]
   abs?: boolean
   absolute?: boolean
   superleaves?: GlobPattern[]
+  cwd?: string
+}
+
+interface ROptions extends Options {
+  pattern: string
+  cwd: string
 }
 
 export const DEFAULT_PATTERN = './src/**/*'
 const DEFAULT_OPTIONS = {
   absolute: false,
+  cwd: process.cwd(),
 }
 
 function getChanged(argChanged?: Filename[]): string[] {
@@ -53,23 +60,43 @@ function getChanged(argChanged?: Filename[]): string[] {
   return changed.filter((f) => fs.existsSync(f))
 }
 
-function getArgs(patternArg: string | Options, optionsArg?: Options): { pattern: string; options: Options } {
+function getOptions(patternArg: string | Options, optionsArg?: Options): ROptions {
   let pattern = DEFAULT_PATTERN
-  let options = optionsArg || DEFAULT_OPTIONS
+  let realOptionsArg = optionsArg
 
   if (typeof patternArg === 'object') {
-    options = patternArg
+    realOptionsArg = patternArg
     pattern = patternArg.pattern || DEFAULT_PATTERN
   } else {
     pattern = patternArg
   }
 
-  return { pattern, options }
+  let options: ROptions = { pattern, ...DEFAULT_OPTIONS, ...realOptionsArg }
+
+  let fileOptions: Options = {}
+
+  try {
+    const fn = path.resolve(options.cwd as string, 'affected-files.config.js')
+
+    fileOptions = require(fn)
+    log(`File config found`, fn, fileOptions)
+  } catch (e) {
+    log(`No config file detected`)
+  }
+
+  options = { pattern, ...DEFAULT_OPTIONS, ...fileOptions, ...realOptionsArg }
+
+  return options
 }
 
-function getAffectedFiles(patternArg: string | Options, optionsArg?: Options): string[] {
-  const { pattern, options } = getArgs(patternArg, optionsArg)
-  const isAbs = options.abs || options.absolute || false
+function publicGetAffectedFiles(patternArg: string | Options, optionsArg?: Options) {
+  const options: ROptions = getOptions(patternArg, optionsArg)
+
+  return getAffectedFiles(options)
+}
+
+function getAffectedFiles(options: ROptions): string[] {
+  const { pattern, absolute, cwd } = options
 
   if (options.changed) {
     log('custom changed detected', options.changed)
@@ -79,7 +106,7 @@ function getAffectedFiles(patternArg: string | Options, optionsArg?: Options): s
 
   log('pattern', pattern)
 
-  const sources = glob.sync(pattern)
+  const sources = glob.sync(pattern, { cwd, absolute: true })
 
   log('sources', sources)
 
@@ -115,19 +142,19 @@ function getAffectedFiles(patternArg: string | Options, optionsArg?: Options): s
       if (affectedSet.has(fn)) {
         log(`Superleaf "${fn}" is affected, returning all files`, options.superleaves)
 
-        return glob.sync(pattern, { absolute: isAbs })
+        return glob.sync(pattern, { absolute })
       }
     }
 
     log(`Superleaves not affected, returning only affected files`)
   }
 
-  if (isAbs === true) {
+  if (absolute === true) {
     return affectedFiles
   }
 
   // /abs/path/to/cwd/folder/1.js → folder/1.js
-  return affectedFiles.map((f: string) => f.slice(process.cwd().length + 1))
+  return affectedFiles.map((f: string) => f.slice(cwd.length + 1))
 }
 
-export default getAffectedFiles
+export default publicGetAffectedFiles

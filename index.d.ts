@@ -1,12 +1,13 @@
 declare type Filename = string;
 declare type GlobPattern = string;
-declare type Options = {
+interface Options {
     pattern?: string;
     changed?: Filename[];
     abs?: boolean;
     absolute?: boolean;
     superleaves?: GlobPattern[];
-};
+    cwd?: string;
+}
 export declare const DEFAULT_PATTERN = "./src/**/*";
-declare function getAffectedFiles(patternArg: string | Options, optionsArg?: Options): string[];
-export default getAffectedFiles;
+declare function publicGetAffectedFiles(patternArg: string | Options, optionsArg?: Options): string[];
+export default publicGetAffectedFiles;
