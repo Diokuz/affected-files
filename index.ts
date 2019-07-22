@@ -3,6 +3,7 @@ import path from 'path'
 import { execSync } from 'child_process'
 import glob from 'glob'
 import debug from 'debug'
+import minimatch from 'minimatch'
 import filterDependent from 'filter-dependent'
 
 const log = debug('af')
@@ -11,12 +12,17 @@ type Filename = string
 type GlobPattern = string
 
 type Options = {
+  pattern?: string
   changed?: Filename[]
   abs?: boolean
+  absolute?: boolean
   superleaves?: GlobPattern[]
 }
 
 export const DEFAULT_PATTERN = './src/**/*'
+const DEFAULT_OPTIONS = {
+  absolute: false,
+}
 
 function getChanged(argChanged?: Filename[]): string[] {
   if (argChanged) {
@@ -47,7 +53,24 @@ function getChanged(argChanged?: Filename[]): string[] {
   return changed.filter((f) => fs.existsSync(f))
 }
 
-function getAffectedFiles(pattern: string = DEFAULT_PATTERN, options: Options = {}): string[] {
+function getArgs(patternArg: string | Options, optionsArg?: Options): { pattern: string; options: Options } {
+  let pattern = DEFAULT_PATTERN
+  let options = optionsArg || DEFAULT_OPTIONS
+
+  if (typeof patternArg === 'object') {
+    options = patternArg
+    pattern = patternArg.pattern || DEFAULT_PATTERN
+  } else {
+    pattern = patternArg
+  }
+
+  return { pattern, options }
+}
+
+function getAffectedFiles(patternArg: string | Options, optionsArg?: Options): string[] {
+  const { pattern, options } = getArgs(patternArg, optionsArg)
+  const isAbs = options.abs || options.absolute || false
+
   if (options.changed) {
     log('custom changed detected', options.changed)
   }
@@ -77,6 +100,14 @@ function getAffectedFiles(pattern: string = DEFAULT_PATTERN, options: Options = 
 
     log('superfiles', superfiles)
 
+    log(`checking superfiles to match pattern...`)
+
+    superfiles.forEach((f) => {
+      if (!minimatch(f, pattern)) {
+        throw new Error(`Superfile "${f}" does not match against pattern "${pattern}"`)
+      }
+    })
+
     const superfilesSet = new Set(superfiles)
     const affectedSet = new Set(affectedFiles)
 
@@ -84,14 +115,14 @@ function getAffectedFiles(pattern: string = DEFAULT_PATTERN, options: Options = 
       if (affectedSet.has(fn)) {
         log(`Superleaf "${fn}" is affected, returning all files`, options.superleaves)
 
-        return glob.sync(pattern, { absolute: options.abs })
+        return glob.sync(pattern, { absolute: isAbs })
       }
     }
 
     log(`Superleaves not affected, returning only affected files`)
   }
 
-  if (options.abs === true) {
+  if (isAbs === true) {
     return affectedFiles
   }
 

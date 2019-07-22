@@ -43,6 +43,8 @@ where
 
 `options.superleaves` (optional) – an array of glob patterns of files, which considered as superleaves. That means, every js/ts files in your repo is dependent from every superleaf. For example, you need to build full storybook every time you have changed something in `./.storybook`. Then just use `getAffected(pattern, { superleaves: '.storybook/*' })`.
 
+`options.absolute` (optional) – boolean, default to false. If true, returns absplute paths of affected files.
+
 ## CLI
 
 ```sh

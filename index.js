@@ -8,9 +8,13 @@ const path_1 = __importDefault(require("path"));
 const child_process_1 = require("child_process");
 const glob_1 = __importDefault(require("glob"));
 const debug_1 = __importDefault(require("debug"));
+const minimatch_1 = __importDefault(require("minimatch"));
 const filter_dependent_1 = __importDefault(require("filter-dependent"));
 const log = debug_1.default('af');
 exports.DEFAULT_PATTERN = './src/**/*';
+const DEFAULT_OPTIONS = {
+    absolute: false,
+};
 function getChanged(argChanged) {
     if (argChanged) {
         // to abs path
@@ -34,7 +38,21 @@ function getChanged(argChanged) {
     log('changed', changed);
     return changed.filter((f) => fs_1.default.existsSync(f));
 }
-function getAffectedFiles(pattern = exports.DEFAULT_PATTERN, options = {}) {
+function getArgs(patternArg, optionsArg) {
+    let pattern = exports.DEFAULT_PATTERN;
+    let options = optionsArg || DEFAULT_OPTIONS;
+    if (typeof patternArg === 'object') {
+        options = patternArg;
+        pattern = patternArg.pattern || exports.DEFAULT_PATTERN;
+    }
+    else {
+        pattern = patternArg;
+    }
+    return { pattern, options };
+}
+function getAffectedFiles(patternArg, optionsArg) {
+    const { pattern, options } = getArgs(patternArg, optionsArg);
+    const isAbs = options.abs || options.absolute || false;
     if (options.changed) {
         log('custom changed detected', options.changed);
     }
@@ -52,17 +70,23 @@ function getAffectedFiles(pattern = exports.DEFAULT_PATTERN, options = {}) {
             return acc;
         }, []);
         log('superfiles', superfiles);
+        log(`checking superfiles to match pattern...`);
+        superfiles.forEach((f) => {
+            if (!minimatch_1.default(f, pattern)) {
+                throw new Error(`Superfile "${f}" does not match against pattern "${pattern}"`);
+            }
+        });
         const superfilesSet = new Set(superfiles);
         const affectedSet = new Set(affectedFiles);
         for (let fn of superfilesSet) {
             if (affectedSet.has(fn)) {
                 log(`Superleaf "${fn}" is affected, returning all files`, options.superleaves);
-                return glob_1.default.sync(pattern, { absolute: options.abs });
+                return glob_1.default.sync(pattern, { absolute: isAbs });
             }
         }
         log(`Superleaves not affected, returning only affected files`);
     }
-    if (options.abs === true) {
+    if (isAbs === true) {
         return affectedFiles;
     }
     // /abs/path/to/cwd/folder/1.js → folder/1.js
