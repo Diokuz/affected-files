@@ -148,8 +148,10 @@ function getAffectedFiles(options: ROptions): string[] {
     log(`checking superfiles to match pattern...`)
 
     superfiles.forEach((f) => {
-      if (!minimatch(f, pattern)) {
-        throw new Error(`Superfile "${f}" does not match against pattern "${pattern}"`)
+      const relf = f.slice(cwd.length + 1)
+
+      if (!minimatch(relf, pattern)) {
+        throw new Error(`Superfile "${relf}" does not match against pattern "${pattern}"`)
       }
     })
 

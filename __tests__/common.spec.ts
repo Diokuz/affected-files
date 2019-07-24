@@ -57,14 +57,22 @@ describe('Superleaves', () => {
     const superleaves = [
       path.resolve(cwd, 'a.js')
     ]
-    expect(() => af('**/*.js', { changed: [], superleaves })).not.toThrow()
+    expect(() => af('**/*.js', { changed: [], cwd, superleaves })).not.toThrow()
   })
 
   it('Must throw when one superleaf not matched against pattern', () => {
     const superleaves = [
       path.resolve(cwd, 'a.js')
     ]
-    expect(() => af('foo/*.js', { changed: [], superleaves })).toThrow()
+    expect(() => af('foo/*.js', { changed: [], cwd, superleaves })).toThrow()
+  })
+
+  it('Must not fail when sulerleaf is absolute path', () => {
+    const superleaves = [
+      path.resolve(cwd, 'a.js')
+    ]
+    expect(() => af('**/*.js', { changed: [], cwd, superleaves, absolute: true }))
+      .not.toThrow()
   })
 })
 
@@ -81,7 +89,7 @@ describe('Config file', () => {
   })
 })
 
-describe.only('options.missing', () => {
+describe('options.missing', () => {
   const fix = ['__tests__', '__fixtures__', 'missing']
   const cwd = path.resolve(process.cwd(), fix[0], fix[1], fix[2])
   const pattern = '**/*.js'
