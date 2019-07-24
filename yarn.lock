@@ -1257,10 +1257,10 @@ fill-range@^4.0.0:
     repeat-string "^1.6.1"
     to-regex-range "^2.1.0"
 
-filter-dependent@^1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/filter-dependent/-/filter-dependent-1.2.1.tgz#3a83ad373d91588f15c9c6da2193d8b4ab0faa9f"
-  integrity sha512-92k4ulEefi48pwPyYOx+sAYmUnexoXIKgBgfLUb/s8DPZUxz/pN1PVk2nP5Y6NvTA1hOTABdu4jn8JpZd1On8A==
+filter-dependent@^1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/filter-dependent/-/filter-dependent-1.3.0.tgz#2655319c0f9a554be79a7dab16fe74bd0f6ffefe"
+  integrity sha512-RrR6nk+dCZJw0moQ8GUlWhhbE1oGTuc0higi1QBWsa8zk5z5W7XtYn8m/Iv/xcXttbpmtNdmIpmsLXwePk+W0g==
   dependencies:
     precinct "^6.1.2"
     resolve "^1.11.1"

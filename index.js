@@ -15,8 +15,9 @@ exports.DEFAULT_PATTERN = './src/**/*';
 const DEFAULT_OPTIONS = {
     absolute: false,
     cwd: process.cwd(),
+    missing: [],
 };
-function getChanged(argChanged) {
+function getChanged(mergeBase = 'origin/master', argChanged) {
     if (argChanged) {
         // to abs path
         return argChanged.map((f) => path_1.default.resolve(f));
@@ -25,7 +26,7 @@ function getChanged(argChanged) {
         .trim()
         .split('\n')
         .filter((s) => s.length);
-    const base = child_process_1.execSync('git merge-base origin/master HEAD')
+    const base = child_process_1.execSync(`git merge-base ${mergeBase} HEAD`)
         .toString()
         .trim();
     const cmd = `git log --name-only --pretty=format: HEAD ^${base}`;
@@ -67,15 +68,26 @@ function publicGetAffectedFiles(patternArg, optionsArg) {
     return getAffectedFiles(options);
 }
 function getAffectedFiles(options) {
-    const { pattern, absolute, cwd } = options;
+    const { pattern, absolute, cwd, missing } = options;
+    const missingSet = new Set(missing);
     if (options.changed) {
         log('custom changed detected', options.changed);
     }
-    const changed = getChanged(options.changed);
+    const changed = getChanged(options.mergeBase, options.changed);
     log('pattern', pattern);
     const sources = glob_1.default.sync(pattern, { cwd, absolute: true });
     log('sources', sources);
-    const affectedFiles = filter_dependent_1.default(sources, changed);
+    const affectedFiles = filter_dependent_1.default(sources, changed, {
+        onMiss: (fn, dep) => {
+            const relFn = fn.slice(cwd.length + 1); // `/root/dir/foo/fn.js` → `foo/fn.js`
+            log('Checking unresolved dependency in missing', relFn, dep);
+            if (missingSet.has(`${relFn} >>> ${dep}`) || missingSet.has(`* >>> ${dep}`)) {
+                return;
+            }
+            console.error(`Failed to resolve "${dep}" in "${fn}". Fix it or add to 'missing'.`);
+            throw new Error(`Failed to resolve "${dep}" in "${fn}"`);
+        },
+    });
     log('affectedFiles', affectedFiles);
     if (options.superleaves) {
         log('superleaves detected', options.superleaves);

@@ -7,6 +7,8 @@ interface Options {
     absolute?: boolean;
     superleaves?: GlobPattern[];
     cwd?: string;
+    missing?: string[];
+    mergeBase?: string;
 }
 export declare const DEFAULT_PATTERN = "./src/**/*";
 declare function publicGetAffectedFiles(patternArg: string | Options, optionsArg?: Options): string[];

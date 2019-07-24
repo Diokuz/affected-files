@@ -80,3 +80,25 @@ describe('Config file', () => {
     ])
   })
 })
+
+describe.only('options.missing', () => {
+  const fix = ['__tests__', '__fixtures__', 'missing']
+  const cwd = path.resolve(process.cwd(), fix[0], fix[1], fix[2])
+  const pattern = '**/*.js'
+  const changed = [ path.resolve(cwd, 'changed.js') ]
+
+  it('Must not fail if missing file is described', () => {
+    const missing = [ 'affected.js >>> missing-library' ]
+    expect(() => af({ pattern, changed, cwd, missing })).not.toThrow()
+  })
+
+  it('Must throw if missing filename is not matched', () => {
+    const missing = [ 'foobar.js >>> missing-library' ]
+    expect(() => af({ pattern, changed, cwd, missing })).toThrow()
+  })
+
+  it('Must not throw if filename is described as *', () => {
+    const missing = [ '* >>> missing-library' ]
+    expect(() => af({ pattern, changed, cwd, missing })).not.toThrow()
+  })
+})

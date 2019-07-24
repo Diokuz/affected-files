@@ -33,17 +33,14 @@ import getAffected from 'affected-files'
 const affected = getAffected(pattern | options [, options])
 ```
 
-where
-
-`pattern` (or `options.pattern`) (optional, `./src/**/*.js` by default) – glob pattern of your source files.
-
-`options.changed` (optional) – an array of changed files paths. By default it is evaluated from git diff relative to origin/master, but you could define custom _changed_ array.
-
-`options.superleaves` (optional) – an array of glob patterns of files, which considered as superleaves. That means, every js/ts files in your repo is dependent from every superleaf. For example, you need to build full storybook every time you have changed something in `./.storybook`. Then just use `getAffected(pattern, { superleaves: '.storybook/*' })`.
-
-`options.absolute` (optional, _false_ by default) – if true, returns absplute paths of affected files, relative to options.cwd otherwise.
-
-`options.cwd` (optional, _process.cwd()_ by default) – absolute path of cwd folder, where to find files.
+| Option        | default           | description  |
+| ------------- |:------------- |:----- |
+| `pattern`      | `./src/**/*.js` | Glob pattern of your source files. Could be defined either as a first argument, or as a _pattern_ property of option object, which became first argument in that case (getAffected(pattern, options) or getAffected({ pattern, ...options })are equal). |
+| `changed` | `git diff ...` | An array of changed files paths. By default it is evaluated from git diff relative to origin/master, but you could define custom _changed_ array. |
+| `superleaves` | `[]` | An array of glob patterns of files, which considered as superleaves. That means, every js/ts files in your repo is dependent from every superleaf. For example, you need to build full storybook every time you have changed something in `./.storybook`. Then just use `getAffected(pattern, { superleaves: '.storybook/*' })`. Note: every _superfile_ must match _pattern_ |
+| `absolute` | `false` | If true, returns absolute paths of affected files, relative to options.cwd otherwise. |
+| `cwd` | `process.cwd()` | Absolute path of cwd folder, where to find files. |
+| `mergeBase` | `origin/master` | Branch or revision which will be used to take a git diff. |
 
 ## affected-files.config.js
 
