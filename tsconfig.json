@@ -9,7 +9,6 @@
     "module": "CommonJS",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "sourceMap": true,
     "declaration": true,
     "resolveJsonModule": true,
     "strictNullChecks": true,

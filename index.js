@@ -2,101 +2,30 @@
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const fs_1 = __importDefault(require("fs"));
-const path_1 = __importDefault(require("path"));
-const child_process_1 = require("child_process");
 const glob_1 = __importDefault(require("glob"));
 const debug_1 = __importDefault(require("debug"));
 const minimatch_1 = __importDefault(require("minimatch"));
 const filter_dependent_1 = __importDefault(require("filter-dependent"));
+const options_1 = __importStar(require("./options"));
 const log = debug_1.default('af');
-exports.DEFAULT_PATTERN = './src/**/*';
-const DEFAULT_OPTIONS = {
-    absolute: false,
-    cwd: process.cwd(),
-    missing: [],
-};
-function getChanged(mergeBase = 'origin/master', argChanged) {
-    if (argChanged) {
-        // to abs path
-        return argChanged.map((f) => path_1.default.resolve(f));
-    }
-    const staged = String(child_process_1.execSync('git diff --name-only --pretty=format: HEAD'))
-        .trim()
-        .split('\n')
-        .filter((s) => s.length);
-    const base = child_process_1.execSync(`git merge-base ${mergeBase} HEAD`)
-        .toString()
-        .trim();
-    const cmd = `git log --name-only --pretty=format: HEAD ^${base}`;
-    log('base', base);
-    log('cmd', cmd);
-    const comitted = String(child_process_1.execSync(cmd))
-        .trim()
-        .split('\n')
-        .filter((s) => s.length);
-    const changed = staged.concat(comitted).map((f) => path_1.default.resolve(f));
-    log('changed', changed);
-    return changed.filter((f) => fs_1.default.existsSync(f));
-}
-function getTracked(argTracked) {
-    let tracked = argTracked;
-    if (!tracked) {
-        tracked = String(child_process_1.execSync('git ls-tree --full-tree -r --name-only HEAD'))
-            .trim()
-            .split('\n')
-            .filter((s) => s.length);
-    }
-    log('tracked', tracked);
-    return tracked.map((f) => path_1.default.resolve(f));
-}
-function getOptions(patternArg, optionsArg) {
-    let pattern = exports.DEFAULT_PATTERN;
-    let realOptionsArg = optionsArg;
-    if (typeof patternArg === 'object') {
-        realOptionsArg = patternArg;
-        pattern = patternArg.pattern || exports.DEFAULT_PATTERN;
-    }
-    else {
-        pattern = patternArg;
-    }
-    let options = Object.assign({ pattern }, DEFAULT_OPTIONS, realOptionsArg);
-    let fileOptions = {};
-    try {
-        const fn = path_1.default.resolve(options.cwd, 'affected-files.config.js');
-        fileOptions = require(fn);
-        log(`File config found`, fn, fileOptions);
-    }
-    catch (e) {
-        log(`No config file detected`);
-    }
-    options = Object.assign({ pattern }, DEFAULT_OPTIONS, fileOptions, realOptionsArg);
-    return options;
-}
 function publicGetAffectedFiles(patternArg, optionsArg) {
-    const options = getOptions(patternArg, optionsArg);
+    const options = options_1.default(patternArg, optionsArg);
     return getAffectedFiles(options);
 }
-function absConv(files, absolute, cwd) {
-    return files.map((f) => {
-        if (f.startsWith('/') && !absolute) {
-            return f.slice(cwd.length + 1);
-        }
-        else if (!f.startsWith('/') && absolute) {
-            return path_1.default.resolve(cwd, f);
-        }
-        return f;
-    });
-}
 function getAffectedFiles(options) {
-    const { pattern, absolute, cwd, missing } = options;
+    const { pattern, absolute, cwd, missing, tracked, changed } = options;
     const missingSet = new Set(missing);
     if (options.changed) {
         log('custom changed detected', options.changed);
     }
-    const changed = getChanged(options.mergeBase, options.changed);
-    const tracked = getTracked(options.tracked);
     const trackedSet = new Set(tracked);
     log('pattern', pattern);
     const sources = glob_1.default.sync(pattern, { cwd, absolute: true }).filter((f) => trackedSet.has(f));
@@ -135,7 +64,7 @@ function getAffectedFiles(options) {
         for (let fn of superfilesSet) {
             if (affectedSet.has(fn)) {
                 log(`Superleaf "${fn}" is affected, returning all sources files`);
-                return absConv(sources, absolute, cwd);
+                return options_1.absConv(sources, absolute, cwd);
             }
         }
         log(`Superleaves not affected, returning only affected files`);
@@ -147,4 +76,3 @@ function getAffectedFiles(options) {
     return affectedFiles.map((f) => f.slice(cwd.length + 1));
 }
 exports.default = publicGetAffectedFiles;
-//# sourceMappingURL=index.js.map
