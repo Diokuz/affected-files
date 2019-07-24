@@ -55,7 +55,7 @@ function getAffectedFiles(options) {
         log(`checking superfiles to match pattern...`);
         superfiles.forEach((f) => {
             const relf = f.slice(cwd.length + 1);
-            if (!minimatch_1.default(relf, pattern)) {
+            if (!minimatch_1.default(relf, pattern, { dot })) {
                 throw new Error(`Superfile "${relf}" does not match against pattern "${pattern}"`);
             }
         });
