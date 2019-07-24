@@ -1,3 +1,5 @@
+<h1 align="center">Affected files</h1>
+
 Returns a list of files, which affected in current branch compared to target branch (origin/master by default).
 
 ## Example
