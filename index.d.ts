@@ -9,6 +9,7 @@ interface Options {
     cwd?: string;
     missing?: string[];
     mergeBase?: string;
+    tracked?: Filename[];
 }
 export declare const DEFAULT_PATTERN = "./src/**/*";
 declare function publicGetAffectedFiles(patternArg: string | Options, optionsArg?: Options): string[];

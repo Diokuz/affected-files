@@ -20,12 +20,14 @@ interface Options {
   cwd?: string
   missing?: string[]
   mergeBase?: string
+  tracked?: Filename[]
 }
 
 interface ROptions extends Options {
   pattern: string
   cwd: string
   missing: string[]
+  absolute: boolean
 }
 
 export const DEFAULT_PATTERN = './src/**/*'
@@ -35,7 +37,7 @@ const DEFAULT_OPTIONS = {
   missing: [],
 }
 
-function getChanged(mergeBase: string = 'origin/master', argChanged?: Filename[]): string[] {
+function getChanged(mergeBase: string = 'origin/master', argChanged?: Filename[]): Filename[] {
   if (argChanged) {
     // to abs path
     return argChanged.map((f) => path.resolve(f))
@@ -62,6 +64,21 @@ function getChanged(mergeBase: string = 'origin/master', argChanged?: Filename[]
   log('changed', changed)
 
   return changed.filter((f) => fs.existsSync(f))
+}
+
+function getTracked(argTracked?: Filename[]): Filename[] {
+  let tracked = argTracked
+
+  if (!tracked) {
+    tracked = String(execSync('git ls-tree --full-tree -r --name-only HEAD'))
+      .trim()
+      .split('\n')
+      .filter((s) => s.length)
+  }
+
+  log('tracked', tracked)
+
+  return tracked.map((f) => path.resolve(f))
 }
 
 function getOptions(patternArg: string | Options, optionsArg?: Options): ROptions {
@@ -99,6 +116,18 @@ function publicGetAffectedFiles(patternArg: string | Options, optionsArg?: Optio
   return getAffectedFiles(options)
 }
 
+function absConv(files: Filename[], absolute: boolean, cwd: string) {
+  return files.map((f) => {
+    if (f.startsWith('/') && !absolute) {
+      return f.slice(cwd.length + 1)
+    } else if (!f.startsWith('/') && absolute) {
+      return path.resolve(cwd, f)
+    }
+
+    return f
+  })
+}
+
 function getAffectedFiles(options: ROptions): string[] {
   const { pattern, absolute, cwd, missing } = options
   const missingSet = new Set(missing)
@@ -108,10 +137,12 @@ function getAffectedFiles(options: ROptions): string[] {
   }
 
   const changed = getChanged(options.mergeBase, options.changed)
+  const tracked = getTracked(options.tracked)
+  const trackedSet = new Set(tracked)
 
   log('pattern', pattern)
 
-  const sources = glob.sync(pattern, { cwd, absolute: true })
+  const sources = glob.sync(pattern, { cwd, absolute: true }).filter((f) => trackedSet.has(f))
 
   log('sources', sources)
 
@@ -135,13 +166,15 @@ function getAffectedFiles(options: ROptions): string[] {
   if (options.superleaves) {
     log('superleaves detected', options.superleaves)
 
-    const superfiles = options.superleaves.reduce((acc: string[], sl: GlobPattern) => {
-      const lfiles = glob.sync(sl, { absolute: true })
+    const superfiles = options.superleaves
+      .reduce((acc: string[], sl: GlobPattern) => {
+        const lfiles = glob.sync(sl, { absolute: true })
 
-      acc = acc.concat(lfiles)
+        acc = acc.concat(lfiles)
 
-      return acc
-    }, [])
+        return acc
+      }, [])
+      .filter((f) => trackedSet.has(f))
 
     log('superfiles', superfiles)
 
@@ -160,9 +193,9 @@ function getAffectedFiles(options: ROptions): string[] {
 
     for (let fn of superfilesSet) {
       if (affectedSet.has(fn)) {
-        log(`Superleaf "${fn}" is affected, returning all files`, options.superleaves)
+        log(`Superleaf "${fn}" is affected, returning all sources files`)
 
-        return glob.sync(pattern, { absolute })
+        return absConv(sources, absolute, cwd)
       }
     }
 

@@ -35,6 +35,8 @@ import getAffected from 'affected-files'
 const affected = getAffected(pattern | options [, options])
 ```
 
+All options are optional.
+
 | Option        | default           | description  |
 | ------------- |:------------- |:----- |
 | `pattern`      | `./src/**/*.js` | Glob pattern of your source files. Could be defined either as a first argument, or as a _pattern_ property of option object, which became first argument in that case (getAffected(pattern, options) or getAffected({ pattern, ...options })are equal). |
@@ -43,6 +45,7 @@ const affected = getAffected(pattern | options [, options])
 | `absolute` | `false` | If true, returns absolute paths of affected files, relative to options.cwd otherwise. |
 | `cwd` | `process.cwd()` | Absolute path of cwd folder, where to find files. |
 | `mergeBase` | `origin/master` | Branch or revision which will be used to take a git diff. |
+| `tracked` | `git ls-tree ...` | An array of files, which would be used for dependency tree building. E.g. files in node_modules are not participating in dependency traversing. |
 
 ## affected-files.config.js
 
