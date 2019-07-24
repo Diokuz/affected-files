@@ -32,7 +32,7 @@ If `d.js` was changed in your merge request, files `a.js` and `b.js` also _affec
 ```js
 import getAffected from 'affected-files'
 
-const affected = getAffected(pattern | options [, options])
+const affected = getAffected(options)
 ```
 
 All options are optional.

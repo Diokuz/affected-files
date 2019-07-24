@@ -22,19 +22,23 @@ function publicGetAffectedFiles(patternArg, optionsArg) {
 function getAffectedFiles(options) {
     const { pattern, absolute, cwd, missing, tracked, changed, dot } = options;
     log('tracked', tracked);
+    log('pattern', pattern);
     const trackedSet = new Set(tracked);
     const missingSet = new Set(missing);
     if (options.changed) {
         log('custom changed detected', options.changed);
     }
-    log('pattern', pattern);
     const sources = options_1.filterByPattern(tracked, pattern, { cwd, dot });
     log('sources', sources);
     const affectedFiles = filter_dependent_1.default(sources, changed, {
         onMiss: (fn, dep) => {
             const relFn = fn.slice(cwd.length + 1); // `/root/dir/foo/fn.js` → `foo/fn.js`
             log('Checking unresolved dependency in missing', relFn, dep);
-            if (missingSet.has(`${relFn} >>> ${dep}`) || missingSet.has(`* >>> ${dep}`)) {
+            if (missingSet.has(`${relFn} >>> ${dep}`) ||
+                missingSet.has(`* >>> ${dep}`) ||
+                missingSet.has(`${relFn} >>> *`) ||
+                missingSet.has(`* >>> *`)) {
+                log(`matched one of missing, return`);
                 return;
             }
             console.error(`Failed to resolve "${dep}" in "${fn}". Fix it or add to 'missing'.`);

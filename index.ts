@@ -15,6 +15,7 @@ function publicGetAffectedFiles(patternArg: string | Options, optionsArg?: Optio
 function getAffectedFiles(options: ROptions): string[] {
   const { pattern, absolute, cwd, missing, tracked, changed, dot } = options
   log('tracked', tracked)
+  log('pattern', pattern)
   const trackedSet = new Set(tracked)
   const missingSet = new Set(missing)
 
@@ -22,19 +23,21 @@ function getAffectedFiles(options: ROptions): string[] {
     log('custom changed detected', options.changed)
   }
 
-  log('pattern', pattern)
-
   const sources = filterByPattern(tracked, pattern, { cwd, dot })
-
   log('sources', sources)
 
   const affectedFiles = filterDependent(sources, changed, {
     onMiss: (fn, dep) => {
       const relFn = fn.slice(cwd.length + 1) // `/root/dir/foo/fn.js` → `foo/fn.js`
-
       log('Checking unresolved dependency in missing', relFn, dep)
 
-      if (missingSet.has(`${relFn} >>> ${dep}`) || missingSet.has(`* >>> ${dep}`)) {
+      if (
+        missingSet.has(`${relFn} >>> ${dep}`) ||
+        missingSet.has(`* >>> ${dep}`) ||
+        missingSet.has(`${relFn} >>> *`) ||
+        missingSet.has(`* >>> *`)
+      ) {
+        log(`matched one of missing, return`)
         return
       }
 
