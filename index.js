@@ -10,7 +10,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const glob_1 = __importDefault(require("glob"));
 const debug_1 = __importDefault(require("debug"));
 const minimatch_1 = __importDefault(require("minimatch"));
 const filter_dependent_1 = __importDefault(require("filter-dependent"));
@@ -22,16 +21,14 @@ function publicGetAffectedFiles(patternArg, optionsArg) {
 }
 function getAffectedFiles(options) {
     const { pattern, absolute, cwd, missing, tracked, changed, dot } = options;
+    log('tracked', tracked);
+    const trackedSet = new Set(tracked);
     const missingSet = new Set(missing);
     if (options.changed) {
         log('custom changed detected', options.changed);
     }
-    const trackedSet = new Set(tracked);
     log('pattern', pattern);
-    const sources = tracked
-        .map(options_1.absConvMap(false, cwd))
-        .filter((f) => minimatch_1.default(f, pattern, { dot }))
-        .map(options_1.absConvMap(true, cwd));
+    const sources = options_1.filterByPattern(tracked, pattern, { cwd, dot });
     log('sources', sources);
     const affectedFiles = filter_dependent_1.default(sources, changed, {
         onMiss: (fn, dep) => {
@@ -49,7 +46,7 @@ function getAffectedFiles(options) {
         log('superleaves detected', options.superleaves);
         const superfiles = options.superleaves
             .reduce((acc, sl) => {
-            const lfiles = glob_1.default.sync(sl, { absolute: true });
+            const lfiles = options_1.filterByPattern(tracked, sl, { dot, cwd });
             acc = acc.concat(lfiles);
             return acc;
         }, [])

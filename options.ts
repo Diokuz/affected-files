@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import { execSync } from 'child_process'
+import minimatch from 'minimatch'
 import { Options, ROptions, Filename } from './types'
 import debug from 'debug'
 
@@ -43,19 +44,20 @@ function getChanged(mergeBase: string = 'origin/master', argChanged?: Filename[]
   return changed.filter((f) => fs.existsSync(f))
 }
 
-function getTracked(argTracked?: Filename[]): Filename[] {
+function getTracked(cwd: string, argTracked?: Filename[]): Filename[] {
   let tracked = argTracked
 
   if (!tracked) {
-    tracked = String(execSync('git ls-tree --full-tree -r --name-only HEAD'))
+    tracked = String(execSync(`git ls-files`, { cwd }))
       .trim()
       .split('\n')
       .filter((s) => s.length)
+      .map(absConvMap(true, cwd))
   }
 
   log('tracked', tracked)
 
-  return tracked.map((f) => path.resolve(f))
+  return tracked.filter((f) => fs.existsSync(f))
 }
 
 function getOptions(patternArg: string | Options, optionsArg?: Options): ROptions {
@@ -84,9 +86,11 @@ function getOptions(patternArg: string | Options, optionsArg?: Options): ROption
 
   options = { pattern, ...DEFAULT_OPTIONS, ...fileOptions, ...realOptionsArg }
 
+  log(`cwd`, options.cwd)
+
   // These operations are expensive, so, running them only for final options
   const changed = getChanged(options.mergeBase, options.changed)
-  const tracked = getTracked(options.tracked)
+  const tracked = getTracked(options.cwd as string, options.tracked)
 
   return { ...options, changed, tracked }
 }
@@ -107,4 +111,18 @@ export function absConvMap(absolute: boolean, cwd: string) {
 
 export function absConv(files: Filename[], absolute: boolean, cwd: string) {
   return files.map(absConvMap(absolute, cwd))
+}
+
+export function filterByPattern(
+  files: Filename[],
+  pattern: string,
+  { cwd, dot }: { cwd: string; dot: boolean }
+) {
+  return files
+    .map(absConvMap(false, cwd))
+    .filter((f) => {
+      // log(`f`, f, pattern, minimatch(f, pattern, { dot }))
+      return minimatch(f, pattern, { dot })
+    })
+    .map(absConvMap(true, cwd))
 }

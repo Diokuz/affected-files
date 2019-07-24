@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const child_process_1 = require("child_process");
+const minimatch_1 = __importDefault(require("minimatch"));
 const debug_1 = __importDefault(require("debug"));
 exports.DEFAULT_PATTERN = '**/*';
 const DEFAULT_OPTIONS = {
@@ -38,16 +39,17 @@ function getChanged(mergeBase = 'origin/master', argChanged) {
     log('changed', changed);
     return changed.filter((f) => fs_1.default.existsSync(f));
 }
-function getTracked(argTracked) {
+function getTracked(cwd, argTracked) {
     let tracked = argTracked;
     if (!tracked) {
-        tracked = String(child_process_1.execSync('git ls-tree --full-tree -r --name-only HEAD'))
+        tracked = String(child_process_1.execSync(`git ls-files`, { cwd }))
             .trim()
             .split('\n')
-            .filter((s) => s.length);
+            .filter((s) => s.length)
+            .map(absConvMap(true, cwd));
     }
     log('tracked', tracked);
-    return tracked.map((f) => path_1.default.resolve(f));
+    return tracked.filter((f) => fs_1.default.existsSync(f));
 }
 function getOptions(patternArg, optionsArg) {
     let pattern = exports.DEFAULT_PATTERN;
@@ -70,9 +72,10 @@ function getOptions(patternArg, optionsArg) {
         log(`No config file detected`);
     }
     options = Object.assign({ pattern }, DEFAULT_OPTIONS, fileOptions, realOptionsArg);
+    log(`cwd`, options.cwd);
     // These operations are expensive, so, running them only for final options
     const changed = getChanged(options.mergeBase, options.changed);
-    const tracked = getTracked(options.tracked);
+    const tracked = getTracked(options.cwd, options.tracked);
     return Object.assign({}, options, { changed, tracked });
 }
 exports.default = getOptions;
@@ -92,3 +95,13 @@ function absConv(files, absolute, cwd) {
     return files.map(absConvMap(absolute, cwd));
 }
 exports.absConv = absConv;
+function filterByPattern(files, pattern, { cwd, dot }) {
+    return files
+        .map(absConvMap(false, cwd))
+        .filter((f) => {
+        // log(`f`, f, pattern, minimatch(f, pattern, { dot }))
+        return minimatch_1.default(f, pattern, { dot });
+    })
+        .map(absConvMap(true, cwd));
+}
+exports.filterByPattern = filterByPattern;

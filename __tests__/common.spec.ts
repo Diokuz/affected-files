@@ -42,35 +42,27 @@ describe('Superleaves', () => {
   const cwd = path.resolve(process.cwd(), fix[0], fix[1], fix[2])
 
   it('Must include all files if superleaf is changed', () => {
-    const superleaves = [
-      path.resolve(cwd, 'a.js')
-    ]
-    const changed = superleaves
-    const result = af('**/superleaves/**/*.js', { changed, superleaves })
+    const superleaves = ['a.js']
+    const changed = [path.resolve(cwd, 'a.js')]
+    const result = af({ changed, superleaves, cwd })
     expect(result).toEqual([
-      '__tests__/__fixtures__/superleaves/a.js',
-      '__tests__/__fixtures__/superleaves/foo/b.js',
+      'a.js',
+      'foo/b.js',
     ])
   })
 
   it('Must not throw when all superleaves are matched against pattern', () => {
-    const superleaves = [
-      path.resolve(cwd, 'a.js')
-    ]
+    const superleaves = ['a.js']
     expect(() => af('**/*.js', { changed: [], cwd, superleaves })).not.toThrow()
   })
 
   it('Must throw when one superleaf not matched against pattern', () => {
-    const superleaves = [
-      path.resolve(cwd, 'a.js')
-    ]
+    const superleaves = ['a.js']
     expect(() => af('foo/*.js', { changed: [], cwd, superleaves })).toThrow()
   })
 
   it('Must not fail when sulerleaf is absolute path', () => {
-    const superleaves = [
-      path.resolve(cwd, 'a.js')
-    ]
+    const superleaves = ['a.js']
     expect(() => af('**/*.js', { changed: [], cwd, superleaves, absolute: true }))
       .not.toThrow()
   })
@@ -114,7 +106,6 @@ describe('options.missing', () => {
 describe('options.tracked', () => {
   const fix = ['__tests__', '__fixtures__', 'gitignore']
   const cwd = path.resolve(process.cwd(), fix[0], fix[1], fix[2])
-  const pattern = '**/*.js'
   const changed = [ path.resolve(cwd, 'changed.js') ]
   const tracked = [
     path.resolve(cwd, 'changed.js'),
@@ -126,24 +117,26 @@ describe('options.tracked', () => {
   ]
 
   it('Must not include ignored files', () => {
-    const result = af({ pattern, changed, cwd, tracked })
+    const result = af({ changed, cwd, tracked })
 
-    expect(result).toEqual(['affected.js', 'changed.js'])
+    expect(result).toEqual(['changed.js', 'affected.js'])
   })
 
   it('Must not account for ignored superleaves', () => {
-    const superleaves = [path.resolve(cwd, 'ignored-superleaf.js')]
-    const result = af({ pattern, changed: [...superleaves], cwd, tracked, superleaves })
+    const superleaves = ['ignored-superleaf.js']
+    const changed = [path.resolve(cwd, 'ignored-superleaf.js')]
+    const result = af({ changed, cwd, tracked, superleaves })
     expect(result).toEqual([])
   })
 
   it('Must account for not-ignored superleaves', () => {
+    const superleaves = ['ignored-superleaf.js']
     const localTracked = [
       ...tracked,
       path.resolve(cwd, 'ignored-superleaf.js'), // add ignored to tracked
     ]
-    const superleaves = [path.resolve(cwd, 'ignored-superleaf.js')]
-    const result = af({ pattern, changed: [...superleaves], cwd, tracked: localTracked, superleaves })
-    expect(result).toEqual(['affected.js', 'changed.js', 'ignored-superleaf.js', 'not-affected.js'])
+    const changed = [path.resolve(cwd, 'ignored-superleaf.js')]
+    const result = af({ changed, cwd, tracked: localTracked, superleaves })
+    expect(result).toEqual(['changed.js', 'affected.js', 'not-affected.js', 'ignored-superleaf.js'])
   })
 })
