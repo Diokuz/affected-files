@@ -21,14 +21,17 @@ function publicGetAffectedFiles(patternArg, optionsArg) {
     return getAffectedFiles(options);
 }
 function getAffectedFiles(options) {
-    const { pattern, absolute, cwd, missing, tracked, changed } = options;
+    const { pattern, absolute, cwd, missing, tracked, changed, dot } = options;
     const missingSet = new Set(missing);
     if (options.changed) {
         log('custom changed detected', options.changed);
     }
     const trackedSet = new Set(tracked);
     log('pattern', pattern);
-    const sources = glob_1.default.sync(pattern, { cwd, absolute: true }).filter((f) => trackedSet.has(f));
+    const sources = tracked
+        .map(options_1.absConvMap(false, cwd))
+        .filter((f) => minimatch_1.default(f, pattern, { dot }))
+        .map(options_1.absConvMap(true, cwd));
     log('sources', sources);
     const affectedFiles = filter_dependent_1.default(sources, changed, {
         onMiss: (fn, dep) => {

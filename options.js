@@ -12,6 +12,7 @@ const DEFAULT_OPTIONS = {
     absolute: false,
     cwd: process.cwd(),
     missing: [],
+    dot: false,
 };
 const log = debug_1.default('af');
 function getChanged(mergeBase = 'origin/master', argChanged) {
@@ -75,8 +76,8 @@ function getOptions(patternArg, optionsArg) {
     return Object.assign({}, options, { changed, tracked });
 }
 exports.default = getOptions;
-function absConv(files, absolute, cwd) {
-    return files.map((f) => {
+function absConvMap(absolute, cwd) {
+    return (f) => {
         if (f.startsWith('/') && !absolute) {
             return f.slice(cwd.length + 1);
         }
@@ -84,6 +85,10 @@ function absConv(files, absolute, cwd) {
             return path_1.default.resolve(cwd, f);
         }
         return f;
-    });
+    };
+}
+exports.absConvMap = absConvMap;
+function absConv(files, absolute, cwd) {
+    return files.map(absConvMap(absolute, cwd));
 }
 exports.absConv = absConv;

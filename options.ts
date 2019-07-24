@@ -9,6 +9,7 @@ const DEFAULT_OPTIONS = {
   absolute: false,
   cwd: process.cwd(),
   missing: [],
+  dot: false,
 }
 
 const log = debug('af')
@@ -92,8 +93,8 @@ function getOptions(patternArg: string | Options, optionsArg?: Options): ROption
 
 export default getOptions
 
-export function absConv(files: Filename[], absolute: boolean, cwd: string) {
-  return files.map((f) => {
+export function absConvMap(absolute: boolean, cwd: string) {
+  return (f: Filename) => {
     if (f.startsWith('/') && !absolute) {
       return f.slice(cwd.length + 1)
     } else if (!f.startsWith('/') && absolute) {
@@ -101,5 +102,9 @@ export function absConv(files: Filename[], absolute: boolean, cwd: string) {
     }
 
     return f
-  })
+  }
+}
+
+export function absConv(files: Filename[], absolute: boolean, cwd: string) {
+  return files.map(absConvMap(absolute, cwd))
 }

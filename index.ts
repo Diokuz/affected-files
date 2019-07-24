@@ -2,7 +2,7 @@ import glob from 'glob'
 import debug from 'debug'
 import minimatch from 'minimatch'
 import filterDependent from 'filter-dependent'
-import getOptions, { absConv } from './options'
+import getOptions, { absConv, absConvMap } from './options'
 import { Options, ROptions, GlobPattern } from './types'
 
 const log = debug('af')
@@ -14,7 +14,7 @@ function publicGetAffectedFiles(patternArg: string | Options, optionsArg?: Optio
 }
 
 function getAffectedFiles(options: ROptions): string[] {
-  const { pattern, absolute, cwd, missing, tracked, changed } = options
+  const { pattern, absolute, cwd, missing, tracked, changed, dot } = options
   const missingSet = new Set(missing)
 
   if (options.changed) {
@@ -25,7 +25,10 @@ function getAffectedFiles(options: ROptions): string[] {
 
   log('pattern', pattern)
 
-  const sources = glob.sync(pattern, { cwd, absolute: true }).filter((f) => trackedSet.has(f))
+  const sources = tracked
+    .map(absConvMap(false, cwd))
+    .filter((f) => minimatch(f, pattern, { dot }))
+    .map(absConvMap(true, cwd))
 
   log('sources', sources)
 

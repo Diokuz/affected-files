@@ -10,6 +10,7 @@ export interface Options {
     missing?: string[];
     mergeBase?: string;
     tracked?: Filename[];
+    dot?: boolean;
 }
 export interface ROptions extends Options {
     changed: Filename[];
@@ -18,4 +19,5 @@ export interface ROptions extends Options {
     cwd: string;
     missing: string[];
     absolute: boolean;
+    dot: boolean;
 }
