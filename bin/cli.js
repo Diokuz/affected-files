@@ -6,7 +6,7 @@ const pattern = process.argv[2] || ''
 
 console.log('pattern: ', pattern)
 
-if (pattern.indexOf('*') === -1) {
+if (pattern.length > 0 && pattern.indexOf('*') === -1) {
   console.log('No asterisk found. Forgot to add quotes around pattern?')
 }
 

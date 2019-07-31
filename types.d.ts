@@ -5,6 +5,7 @@ export interface Options {
     changed?: Filename[];
     abs?: boolean;
     absolute?: boolean;
+    usink?: GlobPattern[];
     superleaves?: GlobPattern[];
     cwd?: string;
     missing?: string[];

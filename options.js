@@ -15,7 +15,7 @@ const DEFAULT_OPTIONS = {
     missing: [],
     dot: false,
 };
-const log = debug_1.default('af');
+const log = debug_1.default('af:opts');
 function getChanged(mergeBase = 'origin/master', argChanged) {
     if (argChanged) {
         // to abs path
@@ -76,7 +76,15 @@ function getOptions(patternArg, optionsArg) {
     // These operations are expensive, so, running them only for final options
     const changed = getChanged(options.mergeBase, options.changed);
     const tracked = getTracked(options.cwd, options.tracked);
-    return Object.assign({}, options, { changed, tracked });
+    const result = Object.assign({}, options, { changed, tracked });
+    if (result.superleaves) {
+        console.warn('deprecated options.superleaves detected, use options.sink instead');
+        if (result.usink) {
+            throw new Error(`Cannot operate both: with options.superleaves and options.sink! Use only options.sink.`);
+        }
+        result.usink = result.superleaves;
+    }
+    return result;
 }
 exports.default = getOptions;
 function absConvMap(absolute, cwd) {

@@ -46,32 +46,32 @@ function getAffectedFiles(options) {
         },
     });
     log('affectedFiles', affectedFiles);
-    if (options.superleaves) {
-        log('superleaves detected', options.superleaves);
-        const superfiles = options.superleaves
+    if (options.usink) {
+        log('usink detected', options.usink);
+        const usinkFiles = options.usink
             .reduce((acc, sl) => {
             const lfiles = options_1.filterByPattern(tracked, sl, { dot, cwd });
             acc = acc.concat(lfiles);
             return acc;
         }, [])
             .filter((f) => trackedSet.has(f));
-        log('superfiles', superfiles);
-        log(`checking superfiles to match pattern...`);
-        superfiles.forEach((f) => {
+        log('usinkFiles', usinkFiles);
+        log(`checking usinkFiles to match pattern...`);
+        usinkFiles.forEach((f) => {
             const relf = f.slice(cwd.length + 1);
             if (!minimatch_1.default(relf, pattern, { dot })) {
-                throw new Error(`Superfile "${relf}" does not match against pattern "${pattern}"`);
+                throw new Error(`usink file "${relf}" does not match against pattern "${pattern}"`);
             }
         });
-        const superfilesSet = new Set(superfiles);
+        const usinkFilesSet = new Set(usinkFiles);
         const affectedSet = new Set(affectedFiles);
-        for (let fn of superfilesSet) {
+        for (let fn of usinkFilesSet) {
             if (affectedSet.has(fn)) {
-                log(`Superleaf "${fn}" is affected, returning all sources files`);
+                log(`usink file "${fn}" is affected, returning all sources files`);
                 return options_1.absConv(sources, absolute, cwd);
             }
         }
-        log(`Superleaves not affected, returning only affected files`);
+        log(`usink not affected, returning only affected files`);
     }
     if (absolute === true) {
         return affectedFiles;

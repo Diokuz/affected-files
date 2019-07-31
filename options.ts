@@ -13,7 +13,7 @@ const DEFAULT_OPTIONS = {
   dot: false,
 }
 
-const log = debug('af')
+const log = debug('af:opts')
 
 function getChanged(mergeBase: string = 'origin/master', argChanged?: Filename[]): Filename[] {
   if (argChanged) {
@@ -91,8 +91,21 @@ function getOptions(patternArg: string | Options, optionsArg?: Options): ROption
   // These operations are expensive, so, running them only for final options
   const changed = getChanged(options.mergeBase, options.changed)
   const tracked = getTracked(options.cwd as string, options.tracked)
+  const result = { ...options, changed, tracked }
 
-  return { ...options, changed, tracked }
+  if (result.superleaves) {
+    console.warn('deprecated options.superleaves detected, use options.sink instead')
+
+    if (result.usink) {
+      throw new Error(
+        `Cannot operate both: with options.superleaves and options.sink! Use only options.sink.`
+      )
+    }
+
+    result.usink = result.superleaves
+  }
+
+  return result
 }
 
 export default getOptions

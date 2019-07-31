@@ -17,4 +17,4 @@ jest: clean
 	yarn jest
 
 tracked:
-	git ls-tree --full-tree -r --name-only HEAD
+	git ls-files

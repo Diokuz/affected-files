@@ -48,10 +48,10 @@ function getAffectedFiles(options: ROptions): string[] {
 
   log('affectedFiles', affectedFiles)
 
-  if (options.superleaves) {
-    log('superleaves detected', options.superleaves)
+  if (options.usink) {
+    log('usink detected', options.usink)
 
-    const superfiles = options.superleaves
+    const usinkFiles = options.usink
       .reduce((acc: string[], sl: GlobPattern) => {
         const lfiles = filterByPattern(tracked, sl, { dot, cwd })
 
@@ -61,30 +61,30 @@ function getAffectedFiles(options: ROptions): string[] {
       }, [])
       .filter((f) => trackedSet.has(f))
 
-    log('superfiles', superfiles)
+    log('usinkFiles', usinkFiles)
 
-    log(`checking superfiles to match pattern...`)
+    log(`checking usinkFiles to match pattern...`)
 
-    superfiles.forEach((f) => {
+    usinkFiles.forEach((f) => {
       const relf = f.slice(cwd.length + 1)
 
       if (!minimatch(relf, pattern, { dot })) {
-        throw new Error(`Superfile "${relf}" does not match against pattern "${pattern}"`)
+        throw new Error(`usink file "${relf}" does not match against pattern "${pattern}"`)
       }
     })
 
-    const superfilesSet = new Set(superfiles)
+    const usinkFilesSet = new Set(usinkFiles)
     const affectedSet = new Set(affectedFiles)
 
-    for (let fn of superfilesSet) {
+    for (let fn of usinkFilesSet) {
       if (affectedSet.has(fn)) {
-        log(`Superleaf "${fn}" is affected, returning all sources files`)
+        log(`usink file "${fn}" is affected, returning all sources files`)
 
         return absConv(sources, absolute, cwd)
       }
     }
 
-    log(`Superleaves not affected, returning only affected files`)
+    log(`usink not affected, returning only affected files`)
   }
 
   if (absolute === true) {

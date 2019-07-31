@@ -6,7 +6,8 @@ export interface Options {
   changed?: Filename[]
   abs?: boolean
   absolute?: boolean
-  superleaves?: GlobPattern[]
+  usink?: GlobPattern[]
+  superleaves?: GlobPattern[] // deprecated
   cwd?: string
   missing?: string[]
   mergeBase?: string
