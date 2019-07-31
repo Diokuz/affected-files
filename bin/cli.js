@@ -15,5 +15,5 @@ const files = getAffectedFiles(pattern)
 if (!files.length) {
   console.log(`Nothing found!`)
 } else {
-  console.log('Affected files:\n', files.join('\n'))
+  console.log('Affected files:\n\n', files.join('\n'), `total: ${files.length}`)
 }

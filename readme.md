@@ -8,20 +8,16 @@ Lets say you have a repo with files
 
 ```
 a.js
-b.js
-c.js
-d.js
+dependent-from-a.js
+dependent-from--dependent-from-a.js
+not-dependent-from-a.js
 ```
 
-Let `a.js` and `b.js` be dependent from `d.js`.
-
-If `d.js` was changed in your merge request, files `a.js` and `b.js` also _affected_. So, `affected-files` will return
+If `a.js` was changed in your merge request, files `dependent-from-a.js` and `dependent-from--dependent-from-a.js` also _affected_. So, `affected-files` will return
 
 ```js
-[ 'a.js', 'b.js', 'd.js' ]
+[ 'a.js', 'dependent-from-a.js', 'dependent-from--dependent-from-a.js' ]
 ```
-
-> note: removed files are not accounted, since it breaks a require chain.
 
 ## Extensions
 
@@ -31,8 +27,9 @@ If `d.js` was changed in your merge request, files `a.js` and `b.js` also _affec
 
 ```js
 import getAffected from 'affected-files'
+// import { getAffectedSync } from 'affected-files'
 
-const affected = getAffected(options)
+const affected = await getAffected(options)
 ```
 
 All options are optional.

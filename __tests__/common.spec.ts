@@ -1,6 +1,9 @@
 import path from 'path'
 // @ts-ignore
-import af from '../index.ts'
+import getAffected, { getAffectedSync } from '../index.ts'
+
+const af = getAffectedSync
+const afa = getAffected
 
 describe('Basic', () => {
   const fix = ['__tests__', '__fixtures__', 'basic']
@@ -9,6 +12,15 @@ describe('Basic', () => {
   it('Must return affected files', () => {
     const changed = [ path.resolve(cwd, 'changed.js') ]
     const result = af({ changed, cwd })
+    expect(result).toEqual([
+      'affected.js',
+      'changed.js',
+    ])
+  })
+
+  it('Must return affected files', async () => {
+    const changed = [ path.resolve(cwd, 'changed.js') ]
+    const result = await afa({ changed, cwd })
     expect(result).toEqual([
       'affected.js',
       'changed.js',
@@ -75,6 +87,15 @@ describe('Config file', () => {
   it('Must return affected files according to config-file pattern', () => {
     const changed = [ path.resolve(cwd, 'x-changed.js') ]
     const result = af({ changed, cwd })
+    expect(result).toEqual([
+      'x-affected.js',
+      'x-changed.js',
+    ])
+  })
+
+  it('Must return affected files according to config-file pattern', async () => {
+    const changed = [ path.resolve(cwd, 'x-changed.js') ]
+    const result = await afa({ changed, cwd })
     expect(result).toEqual([
       'x-affected.js',
       'x-changed.js',

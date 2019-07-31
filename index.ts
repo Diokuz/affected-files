@@ -1,6 +1,6 @@
 import debug from 'debug'
 import minimatch from 'minimatch'
-import { filterDependentSync } from 'filter-dependent'
+import filterDependent, { filterDependentSync } from 'filter-dependent'
 import getOptions, { absConv, filterByPattern } from './options'
 import { Options, ROptions, GlobPattern } from './types'
 
@@ -94,4 +94,22 @@ function getAffectedFilesSync(options: ROptions): string[] {
   return postprocess(affectedFiles, options)
 }
 
-export default getAffectedSync
+async function getAffectedFiles(options: ROptions): Promise<string[]> {
+  const { sources, changed } = options
+
+  const affectedFiles = await filterDependent(sources, changed, {
+    onMiss: getOnMiss(options),
+  })
+
+  log('affectedFiles', affectedFiles)
+
+  return postprocess(affectedFiles, options)
+}
+
+export async function getAffected(patternArg: string | Options, optionsArg?: Options) {
+  const options: ROptions = getOptions(patternArg, optionsArg)
+
+  return getAffectedFiles(options)
+}
+
+export default getAffected

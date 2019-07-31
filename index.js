@@ -1,4 +1,12 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -12,7 +20,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const debug_1 = __importDefault(require("debug"));
 const minimatch_1 = __importDefault(require("minimatch"));
-const filter_dependent_1 = require("filter-dependent");
+const filter_dependent_1 = __importStar(require("filter-dependent"));
 const options_1 = __importStar(require("./options"));
 const log = debug_1.default('af');
 function getAffectedSync(patternArg, optionsArg) {
@@ -78,4 +86,21 @@ function getAffectedFilesSync(options) {
     log('affectedFiles', affectedFiles);
     return postprocess(affectedFiles, options);
 }
-exports.default = getAffectedSync;
+function getAffectedFiles(options) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const { sources, changed } = options;
+        const affectedFiles = yield filter_dependent_1.default(sources, changed, {
+            onMiss: getOnMiss(options),
+        });
+        log('affectedFiles', affectedFiles);
+        return postprocess(affectedFiles, options);
+    });
+}
+function getAffected(patternArg, optionsArg) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const options = options_1.default(patternArg, optionsArg);
+        return getAffectedFiles(options);
+    });
+}
+exports.getAffected = getAffected;
+exports.default = getAffected;
