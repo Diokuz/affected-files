@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const getAffectedFiles = require('..').default
+const getAffectedFiles = require('../lib').default
 
 const pattern = process.argv[2] || '**/*'
 
