@@ -79,7 +79,7 @@ function getOptions(patternArg, optionsArg) {
     const trackedSet = new Set(tracked);
     const result = Object.assign({}, options, { changed, tracked, trackedSet });
     if (result.superleaves) {
-        console.warn('deprecated options.superleaves detected, use options.sink instead');
+        console.warn('deprecated options.superleaves detected, use options.usink instead');
         if (result.usink) {
             throw new Error(`Cannot operate both: with options.superleaves and options.sink! Use only options.sink.`);
         }

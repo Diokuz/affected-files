@@ -95,7 +95,7 @@ function getOptions(patternArg: string | Options, optionsArg?: Options): ROption
   const result = { ...options, changed, tracked, trackedSet } as ROptions
 
   if (result.superleaves) {
-    console.warn('deprecated options.superleaves detected, use options.sink instead')
+    console.warn('deprecated options.superleaves detected, use options.usink instead')
 
     if (result.usink) {
       throw new Error(
