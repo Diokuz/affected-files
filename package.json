@@ -1,6 +1,6 @@
 {
   "name": "affected-files",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Retrieves all files which affected in current git branch",
   "author": "Diokuz",
   "license": "MIT",
@@ -25,7 +25,7 @@
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
-    "filter-dependent": "^2.0.0",
+    "filter-dependent": "^2.0.1",
     "minimatch": "^3.0.4"
   }
 }
