@@ -2,7 +2,22 @@
 
 Returns a list of files, which affected in current branch compared to target branch (origin/master by default).
 
-## Example
+## CLI
+
+```sh
+$ yarn afiles
+
+pattern:  **/*
+Affected files:
+
+a.js
+dependent-from-a.js
+dependent-from--dependent-from-a.js
+
+total: 3
+```
+
+## Explanation
 
 Lets say you have a repo with files
 
@@ -23,7 +38,7 @@ If `a.js` was changed in your merge request, files `dependent-from-a.js` and `de
 
 `.js`, `.jsx`, `.ts`, `.tsx` are supported. Other extensions – not yet.
 
-## API
+## Configuration
 
 ```js
 import getAffected from 'affected-files'
@@ -47,19 +62,7 @@ All options are optional.
 
 ## affected-files.config.js
 
-Place this file in cwd, and export your default options (including _pattern_).
-
-## CLI
-
-```sh
-$ yarn afiles 'src/**/*.js'
-
-pattern:  src/**/*.js
-Affected files:
-src/index.js
-src/foo.js
-src/bar.js
-```
+Place this file in cwd, and export your options.
 
 ## Using in CI
 
