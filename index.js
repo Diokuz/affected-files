@@ -29,16 +29,14 @@ function getAffectedSync(patternArg, optionsArg) {
 }
 exports.getAffectedSync = getAffectedSync;
 function postprocess(affectedFiles, options) {
-    const { pattern, tracked, sources, absolute, dot, cwd, trackedSet } = options;
+    const { pattern, allTracked, sources, absolute, dot, cwd } = options;
     if (typeof options.usink !== 'undefined') {
         log('usink detected', options.usink);
-        const usinkFiles = options.usink
-            .reduce((acc, sl) => {
-            const lfiles = options_1.filterByPattern(tracked, sl, { dot, cwd });
+        const usinkFiles = options.usink.reduce((acc, sl) => {
+            const lfiles = options_1.filterByPattern(allTracked, sl, { dot, cwd });
             acc = acc.concat(lfiles);
             return acc;
-        }, [])
-            .filter((f) => trackedSet.has(f));
+        }, []);
         log('usinkFiles', usinkFiles);
         log(`checking usinkFiles to match pattern...`);
         usinkFiles.forEach((f) => {

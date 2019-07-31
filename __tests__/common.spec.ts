@@ -53,13 +53,24 @@ describe('usink', () => {
   const fix = ['__tests__', '__fixtures__', 'usink']
   const cwd = path.resolve(process.cwd(), fix[0], fix[1], fix[2])
 
-  it('Must include all files if usink is changed', () => {
+  it('Must include all patterned files if usink is changed', () => {
     const usink = ['a.js']
     const changed = [path.resolve(cwd, 'a.js')]
     const result = af({ changed, usink, cwd })
     expect(result).toEqual([
       'a.js',
       'foo/b.js',
+    ])
+  })
+
+  it('Must not include file with wrong extension', () => {
+    const usink = ['a.js']
+    const changed = [path.resolve(cwd, 'a.js')]
+    const result = af({ changed, usink, cwd })
+    expect(result).toEqual([
+      'a.js',
+      'foo/b.js',
+      // 'some.thing',
     ])
   })
 

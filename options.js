@@ -14,6 +14,7 @@ const DEFAULT_OPTIONS = {
     cwd: process.cwd(),
     missing: [],
     dot: false,
+    extensions: ['.js', '.jsx', '.ts', '.tsx'],
 };
 const log = debug_1.default('af:opts');
 function getChanged(mergeBase = 'origin/master', argChanged) {
@@ -75,9 +76,15 @@ function getOptions(patternArg, optionsArg) {
     log(`cwd`, options.cwd);
     // These operations are expensive, so, running them only for final options
     const changed = getChanged(options.mergeBase, options.changed);
-    const tracked = getTracked(options.cwd, options.tracked);
+    const allTracked = getTracked(options.cwd, options.tracked).filter((f) => {
+        // Filtering out all files with unsupported extensions
+        return options.extensions.find((e) => f.endsWith(e));
+    });
+    const result = Object.assign({}, options, { changed, allTracked });
+    const tracked = filterByPattern(allTracked, result.pattern, { cwd: result.cwd, dot: result.dot });
     const trackedSet = new Set(tracked);
-    const result = Object.assign({}, options, { changed, tracked, trackedSet });
+    result.tracked = tracked;
+    result.trackedSet = trackedSet;
     if (result.superleaves) {
         console.warn('deprecated options.superleaves detected, use options.usink instead');
         if (result.usink) {
@@ -86,6 +93,7 @@ function getOptions(patternArg, optionsArg) {
         result.usink = result.superleaves;
     }
     result.sources = filterByPattern(tracked, result.pattern, { cwd: result.cwd, dot: result.dot });
+    log('tracked', result.tracked);
     log('sources', result.sources);
     log('pattern', result.pattern);
     result.missingSet = new Set(result.missing);

@@ -18,10 +18,12 @@ export interface ROptions extends Options {
     changed: Filename[];
     tracked: Filename[];
     trackedSet: Set<string>;
+    allTracked: Filename[];
     pattern: string;
     cwd: string;
     missing: string[];
     missingSet: Set<string>;
     absolute: boolean;
     dot: boolean;
+    extensions: string[];
 }

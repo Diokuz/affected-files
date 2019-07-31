@@ -13,20 +13,18 @@ export function getAffectedSync(patternArg: string | Options, optionsArg?: Optio
 }
 
 function postprocess(affectedFiles: string[], options: ROptions): string[] {
-  const { pattern, tracked, sources, absolute, dot, cwd, trackedSet } = options
+  const { pattern, allTracked, sources, absolute, dot, cwd } = options
 
   if (typeof options.usink !== 'undefined') {
     log('usink detected', options.usink)
 
-    const usinkFiles = options.usink
-      .reduce((acc: string[], sl: GlobPattern) => {
-        const lfiles = filterByPattern(tracked, sl, { dot, cwd })
+    const usinkFiles = options.usink.reduce((acc: string[], sl: GlobPattern) => {
+      const lfiles = filterByPattern(allTracked, sl, { dot, cwd })
 
-        acc = acc.concat(lfiles)
+      acc = acc.concat(lfiles)
 
-        return acc
-      }, [])
-      .filter((f) => trackedSet.has(f))
+      return acc
+    }, [])
 
     log('usinkFiles', usinkFiles)
 
