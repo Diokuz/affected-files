@@ -8,10 +8,10 @@ describe('Basic', () => {
 
   it('Must return affected files', () => {
     const changed = [ path.resolve(cwd, 'changed.js') ]
-    const result = af('**/__fixtures__/basic/**/*.js', { changed })
+    const result = af({ changed, cwd })
     expect(result).toEqual([
-      '__tests__/__fixtures__/basic/affected.js',
-      '__tests__/__fixtures__/basic/changed.js',
+      'affected.js',
+      'changed.js',
     ])
   })
 
@@ -20,19 +20,19 @@ describe('Basic', () => {
       path.resolve(cwd, 'changed.js')
     ]
 
-    const result = af('**/__fixtures__/basic/**/*.js', { changed, absolute: true })
+    const result = af({ changed, absolute: true, cwd })
     expect(result).toEqual([
-      path.resolve('__tests__/__fixtures__/basic/affected.js'),
-      path.resolve('__tests__/__fixtures__/basic/changed.js'),
+      path.resolve(cwd, 'affected.js'),
+      path.resolve(cwd, 'changed.js'),
     ])
   })
 
   it('Must return affected files, options.pattern', () => {
     const changed = [ path.resolve(cwd, 'changed.js') ]
-    const result = af({ pattern: '**/__fixtures__/basic/**/*.js', changed })
+    const result = af({ pattern: 'cha*.js', changed, cwd })
     expect(result).toEqual([
-      '__tests__/__fixtures__/basic/affected.js',
-      '__tests__/__fixtures__/basic/changed.js',
+      // 'affected.js',
+      'changed.js',
     ])
   })
 })
@@ -72,11 +72,12 @@ describe('Config file', () => {
   const fix = ['__tests__', '__fixtures__', 'config-file']
   const cwd = path.resolve(process.cwd(), fix[0], fix[1], fix[2])
 
-  it('Must return affected files according to config pattern', () => {
-    const changed = [ path.resolve(cwd, 'changed.js') ]
+  it('Must return affected files according to config-file pattern', () => {
+    const changed = [ path.resolve(cwd, 'x-changed.js') ]
     const result = af({ changed, cwd })
     expect(result).toEqual([
-      'affected.js',
+      'x-affected.js',
+      'x-changed.js',
     ])
   })
 })

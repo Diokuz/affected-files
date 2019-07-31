@@ -76,13 +76,21 @@ function getOptions(patternArg, optionsArg) {
     // These operations are expensive, so, running them only for final options
     const changed = getChanged(options.mergeBase, options.changed);
     const tracked = getTracked(options.cwd, options.tracked);
-    const result = Object.assign({}, options, { changed, tracked });
+    const trackedSet = new Set(tracked);
+    const result = Object.assign({}, options, { changed, tracked, trackedSet });
     if (result.superleaves) {
         console.warn('deprecated options.superleaves detected, use options.sink instead');
         if (result.usink) {
             throw new Error(`Cannot operate both: with options.superleaves and options.sink! Use only options.sink.`);
         }
         result.usink = result.superleaves;
+    }
+    result.sources = filterByPattern(tracked, result.pattern, { cwd: result.cwd, dot: result.dot });
+    log('sources', result.sources);
+    log('pattern', result.pattern);
+    result.missingSet = new Set(result.missing);
+    if (result.changed) {
+        log('custom changed detected', result.changed);
     }
     return result;
 }
@@ -104,12 +112,15 @@ function absConv(files, absolute, cwd) {
 }
 exports.absConv = absConv;
 function filterByPattern(files, pattern, { cwd, dot }) {
-    return files
+    log(`filterByPattern pattern="${pattern}", input`, files);
+    const output = files
         .map(absConvMap(false, cwd))
         .filter((f) => {
         // log(`f`, f, pattern, minimatch(f, pattern, { dot }))
         return minimatch_1.default(f, pattern, { dot });
     })
         .map(absConvMap(true, cwd));
+    log(`filterByPattern output`, output);
+    return output;
 }
 exports.filterByPattern = filterByPattern;

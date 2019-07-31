@@ -362,10 +362,10 @@
   resolved "https://registry.yarnpkg.com/@types/jest-diff/-/jest-diff-20.0.1.tgz#35cc15b9c4f30a18ef21852e255fdb02f6d59b89"
   integrity sha512-yALhelO3i0hqZwhjtcr6dYyaLoCHbAMshwtj6cGxTvHZAKXHsYGdff6E8EPw3xLKY0ELUTQ69Q1rQiJENnccMA==
 
-"@types/jest@^24.0.15":
-  version "24.0.15"
-  resolved "https://registry.yarnpkg.com/@types/jest/-/jest-24.0.15.tgz#6c42d5af7fe3b44ffff7cc65de7bf741e8fa427f"
-  integrity sha512-MU1HIvWUme74stAoc3mgAi+aMlgKOudgEvQDIm1v4RkrDudBh1T+NFp5sftpBAdXdx1J0PbdpJ+M2EsSOi1djA==
+"@types/jest@^24.0.16":
+  version "24.0.16"
+  resolved "https://registry.yarnpkg.com/@types/jest/-/jest-24.0.16.tgz#8d3e406ec0f0dc1688d6711af3062ff9bd428066"
+  integrity sha512-JrAiyV+PPGKZzw6uxbI761cHZ0G7QMOHXPhtSpcl08rZH6CswXaaejckn3goFKmF7M3nzEoJ0lwYCbqLMmjziQ==
   dependencies:
     "@types/jest-diff" "*"
 
@@ -1257,10 +1257,10 @@ fill-range@^4.0.0:
     repeat-string "^1.6.1"
     to-regex-range "^2.1.0"
 
-filter-dependent@^1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/filter-dependent/-/filter-dependent-1.3.0.tgz#2655319c0f9a554be79a7dab16fe74bd0f6ffefe"
-  integrity sha512-RrR6nk+dCZJw0moQ8GUlWhhbE1oGTuc0higi1QBWsa8zk5z5W7XtYn8m/Iv/xcXttbpmtNdmIpmsLXwePk+W0g==
+filter-dependent@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/filter-dependent/-/filter-dependent-2.0.0.tgz#97be2449dc0977f16407a262563ee9156a782662"
+  integrity sha512-2yFyUpxQzvtF/8/UDAAJc2utsygm6Q/ZN0WbkSZKGfxxHigZ3tIHV5LVxNRSgXprm9prXAtTISjoys1c0JM3dw==
   dependencies:
     precinct "^6.1.2"
     resolve "^1.11.1"

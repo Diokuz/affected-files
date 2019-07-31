@@ -91,7 +91,8 @@ function getOptions(patternArg: string | Options, optionsArg?: Options): ROption
   // These operations are expensive, so, running them only for final options
   const changed = getChanged(options.mergeBase, options.changed)
   const tracked = getTracked(options.cwd as string, options.tracked)
-  const result = { ...options, changed, tracked }
+  const trackedSet = new Set(tracked)
+  const result = { ...options, changed, tracked, trackedSet } as ROptions
 
   if (result.superleaves) {
     console.warn('deprecated options.superleaves detected, use options.sink instead')
@@ -103,6 +104,17 @@ function getOptions(patternArg: string | Options, optionsArg?: Options): ROption
     }
 
     result.usink = result.superleaves
+  }
+
+  result.sources = filterByPattern(tracked, result.pattern, { cwd: result.cwd, dot: result.dot })
+
+  log('sources', result.sources)
+  log('pattern', result.pattern)
+
+  result.missingSet = new Set(result.missing)
+
+  if (result.changed) {
+    log('custom changed detected', result.changed)
   }
 
   return result
@@ -131,11 +143,17 @@ export function filterByPattern(
   pattern: string,
   { cwd, dot }: { cwd: string; dot: boolean }
 ) {
-  return files
+  log(`filterByPattern pattern="${pattern}", input`, files)
+
+  const output = files
     .map(absConvMap(false, cwd))
     .filter((f) => {
       // log(`f`, f, pattern, minimatch(f, pattern, { dot }))
       return minimatch(f, pattern, { dot })
     })
     .map(absConvMap(true, cwd))
+
+  log(`filterByPattern output`, output)
+
+  return output
 }

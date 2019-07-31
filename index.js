@@ -12,41 +12,17 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const debug_1 = __importDefault(require("debug"));
 const minimatch_1 = __importDefault(require("minimatch"));
-const filter_dependent_1 = __importDefault(require("filter-dependent"));
+const filter_dependent_1 = require("filter-dependent");
 const options_1 = __importStar(require("./options"));
 const log = debug_1.default('af');
-function publicGetAffectedFiles(patternArg, optionsArg) {
+function getAffectedSync(patternArg, optionsArg) {
     const options = options_1.default(patternArg, optionsArg);
-    return getAffectedFiles(options);
+    return getAffectedFilesSync(options);
 }
-function getAffectedFiles(options) {
-    const { pattern, absolute, cwd, missing, tracked, changed, dot } = options;
-    log('tracked', tracked);
-    log('pattern', pattern);
-    const trackedSet = new Set(tracked);
-    const missingSet = new Set(missing);
-    if (options.changed) {
-        log('custom changed detected', options.changed);
-    }
-    const sources = options_1.filterByPattern(tracked, pattern, { cwd, dot });
-    log('sources', sources);
-    const affectedFiles = filter_dependent_1.default(sources, changed, {
-        onMiss: (fn, dep) => {
-            const relFn = fn.slice(cwd.length + 1); // `/root/dir/foo/fn.js` → `foo/fn.js`
-            log('Checking unresolved dependency in missing', relFn, dep);
-            if (missingSet.has(`${relFn} >>> ${dep}`) ||
-                missingSet.has(`* >>> ${dep}`) ||
-                missingSet.has(`${relFn} >>> *`) ||
-                missingSet.has(`* >>> *`)) {
-                log(`matched one of missing, return`);
-                return;
-            }
-            console.error(`Failed to resolve "${dep}" in "${fn}". Fix it or add to 'missing'.`);
-            throw new Error(`Failed to resolve "${dep}" in "${fn}"`);
-        },
-    });
-    log('affectedFiles', affectedFiles);
-    if (options.usink) {
+exports.getAffectedSync = getAffectedSync;
+function postprocess(affectedFiles, options) {
+    const { pattern, tracked, sources, absolute, dot, cwd, trackedSet } = options;
+    if (typeof options.usink !== 'undefined') {
         log('usink detected', options.usink);
         const usinkFiles = options.usink
             .reduce((acc, sl) => {
@@ -79,4 +55,27 @@ function getAffectedFiles(options) {
     // /abs/path/to/cwd/folder/1.js → folder/1.js
     return affectedFiles.map((f) => f.slice(cwd.length + 1));
 }
-exports.default = publicGetAffectedFiles;
+function getOnMiss({ missingSet, cwd }) {
+    return (fn, dep) => {
+        const relFn = fn.slice(cwd.length + 1); // `/root/dir/foo/fn.js` → `foo/fn.js`
+        log('Checking unresolved dependency in missing', relFn, dep);
+        if (missingSet.has(`${relFn} >>> ${dep}`) ||
+            missingSet.has(`* >>> ${dep}`) ||
+            missingSet.has(`${relFn} >>> *`) ||
+            missingSet.has(`* >>> *`)) {
+            log(`matched one of missing, return`);
+            return;
+        }
+        console.error(`Failed to resolve "${dep}" in "${fn}". Fix it or add to 'missing'.`);
+        throw new Error(`Failed to resolve "${dep}" in "${fn}"`);
+    };
+}
+function getAffectedFilesSync(options) {
+    const { sources, changed } = options;
+    const affectedFiles = filter_dependent_1.filterDependentSync(sources, changed, {
+        onMiss: getOnMiss(options),
+    });
+    log('affectedFiles', affectedFiles);
+    return postprocess(affectedFiles, options);
+}
+exports.default = getAffectedSync;

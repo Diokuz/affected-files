@@ -1,54 +1,21 @@
 import debug from 'debug'
 import minimatch from 'minimatch'
-import filterDependent from 'filter-dependent'
+import { filterDependentSync } from 'filter-dependent'
 import getOptions, { absConv, filterByPattern } from './options'
 import { Options, ROptions, GlobPattern } from './types'
 
 const log = debug('af')
 
-function publicGetAffectedFiles(patternArg: string | Options, optionsArg?: Options) {
+export function getAffectedSync(patternArg: string | Options, optionsArg?: Options) {
   const options: ROptions = getOptions(patternArg, optionsArg)
 
-  return getAffectedFiles(options)
+  return getAffectedFilesSync(options)
 }
 
-function getAffectedFiles(options: ROptions): string[] {
-  const { pattern, absolute, cwd, missing, tracked, changed, dot } = options
-  log('tracked', tracked)
-  log('pattern', pattern)
-  const trackedSet = new Set(tracked)
-  const missingSet = new Set(missing)
+function postprocess(affectedFiles: string[], options: ROptions): string[] {
+  const { pattern, tracked, sources, absolute, dot, cwd, trackedSet } = options
 
-  if (options.changed) {
-    log('custom changed detected', options.changed)
-  }
-
-  const sources = filterByPattern(tracked, pattern, { cwd, dot })
-  log('sources', sources)
-
-  const affectedFiles = filterDependent(sources, changed, {
-    onMiss: (fn, dep) => {
-      const relFn = fn.slice(cwd.length + 1) // `/root/dir/foo/fn.js` → `foo/fn.js`
-      log('Checking unresolved dependency in missing', relFn, dep)
-
-      if (
-        missingSet.has(`${relFn} >>> ${dep}`) ||
-        missingSet.has(`* >>> ${dep}`) ||
-        missingSet.has(`${relFn} >>> *`) ||
-        missingSet.has(`* >>> *`)
-      ) {
-        log(`matched one of missing, return`)
-        return
-      }
-
-      console.error(`Failed to resolve "${dep}" in "${fn}". Fix it or add to 'missing'.`)
-      throw new Error(`Failed to resolve "${dep}" in "${fn}"`)
-    },
-  })
-
-  log('affectedFiles', affectedFiles)
-
-  if (options.usink) {
+  if (typeof options.usink !== 'undefined') {
     log('usink detected', options.usink)
 
     const usinkFiles = options.usink
@@ -95,4 +62,36 @@ function getAffectedFiles(options: ROptions): string[] {
   return affectedFiles.map((f: string) => f.slice(cwd.length + 1))
 }
 
-export default publicGetAffectedFiles
+function getOnMiss({ missingSet, cwd }: ROptions) {
+  return (fn: string, dep: string) => {
+    const relFn = fn.slice(cwd.length + 1) // `/root/dir/foo/fn.js` → `foo/fn.js`
+    log('Checking unresolved dependency in missing', relFn, dep)
+
+    if (
+      missingSet.has(`${relFn} >>> ${dep}`) ||
+      missingSet.has(`* >>> ${dep}`) ||
+      missingSet.has(`${relFn} >>> *`) ||
+      missingSet.has(`* >>> *`)
+    ) {
+      log(`matched one of missing, return`)
+      return
+    }
+
+    console.error(`Failed to resolve "${dep}" in "${fn}". Fix it or add to 'missing'.`)
+    throw new Error(`Failed to resolve "${dep}" in "${fn}"`)
+  }
+}
+
+function getAffectedFilesSync(options: ROptions): string[] {
+  const { sources, changed } = options
+
+  const affectedFiles = filterDependentSync(sources, changed, {
+    onMiss: getOnMiss(options),
+  })
+
+  log('affectedFiles', affectedFiles)
+
+  return postprocess(affectedFiles, options)
+}
+
+export default getAffectedSync

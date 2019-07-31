@@ -1,3 +1,3 @@
 module.exports = {
-  pattern: 'aff*.js',
+  pattern: 'x-*.js',
 }

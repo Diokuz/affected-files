@@ -16,11 +16,14 @@ export interface Options {
 }
 
 export interface ROptions extends Options {
+  sources: Filename[]
   changed: Filename[]
   tracked: Filename[]
+  trackedSet: Set<string>
   pattern: string
   cwd: string
   missing: string[]
+  missingSet: Set<string>
   absolute: boolean
   dot: boolean
 }
