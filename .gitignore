@@ -7,3 +7,4 @@ npm-debug.log*
 *.sublime*
 *.log
 yarn-error.log
+/lib

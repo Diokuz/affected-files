@@ -4,6 +4,7 @@
   "description": "Retrieves all files which affected in current git branch",
   "author": "Diokuz",
   "license": "MIT",
+  "main": "lib/index.js",
   "repository": {
     "type": "git",
     "url": "git://github.com/diokuz/affected-files.git"

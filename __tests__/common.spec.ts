@@ -1,6 +1,6 @@
 import path from 'path'
 // @ts-ignore
-import getAffected, { getAffectedSync } from '../index.ts'
+import getAffected, { getAffectedSync } from '../src'
 
 const af = getAffectedSync
 const afa = getAffected

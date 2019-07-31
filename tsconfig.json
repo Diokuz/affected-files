@@ -2,20 +2,21 @@
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "target": "es2015",
-    "lib": ["es2015"],
-    "rootDir": "./",
+    "target": "es2017",
+    "rootDir": "./src",
+    "outDir": "./lib",
+    "baseUrl": "./src",
     "moduleResolution": "Node",
     "module": "CommonJS",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "declaration": true,
-    "resolveJsonModule": true,
     "strictNullChecks": true,
     "downlevelIteration": true,
     "noImplicitAny": true
   },
   "exclude": [
-    "./__tests__/**/*"
+    "./__tests__/**/*",
+    "./lib/**/*"
   ]
 }
