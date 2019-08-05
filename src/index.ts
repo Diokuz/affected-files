@@ -5,6 +5,7 @@ import getOptions, { absConv, filterByPattern } from './options'
 import { Options, ROptions, GlobPattern } from './types'
 
 const log = debug('af')
+const plog = debug('af:profiler')
 
 export function getAffectedSync(patternArg: string | Options, optionsArg?: Options) {
   const options: ROptions = getOptions(patternArg, optionsArg)
@@ -85,6 +86,7 @@ function getAffectedFilesSync(options: ROptions): string[] {
 
   const affectedFiles = filterDependentSync(sources, changed, {
     onMiss: getOnMiss(options),
+    externals: options.dontResolve,
   })
 
   log('affectedFiles', affectedFiles)
@@ -95,9 +97,14 @@ function getAffectedFilesSync(options: ROptions): string[] {
 async function getAffectedFiles(options: ROptions): Promise<string[]> {
   const { sources, changed } = options
 
+  plog(`start filterDependent`)
+
   const affectedFiles = await filterDependent(sources, changed, {
     onMiss: getOnMiss(options),
+    externals: options.dontResolve,
   })
+
+  plog(`end filterDependent`)
 
   log('affectedFiles', affectedFiles)
 

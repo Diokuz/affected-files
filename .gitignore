@@ -8,3 +8,4 @@ npm-debug.log*
 *.log
 yarn-error.log
 /lib
+/1.js

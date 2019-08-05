@@ -12,21 +12,22 @@ const DEFAULT_OPTIONS = {
   missing: [],
   dot: false,
   extensions: ['.js', '.jsx', '.ts', '.tsx'],
+  dontResolve: [],
 }
 
 const log = debug('af:opts')
 
-function getChanged(mergeBase: string = 'origin/master', argChanged?: Filename[]): Filename[] {
-  if (argChanged) {
+function getChanged({ mergeBase = 'origin/master', changed, cwd }: any): Filename[] {
+  if (changed) {
     // to abs path
-    return argChanged.map((f) => path.resolve(f))
+    return changed.map((f: string) => path.resolve(f))
   }
 
-  const staged = String(execSync('git diff --name-only --pretty=format: HEAD'))
+  const staged = String(execSync('git diff --name-only --pretty=format: HEAD', { cwd }))
     .trim()
     .split('\n')
     .filter((s) => s.length)
-  const base = execSync(`git merge-base ${mergeBase} HEAD`)
+  const base = execSync(`git merge-base ${mergeBase} HEAD`, { cwd })
     .toString()
     .trim()
   const cmd = `git log --name-only --pretty=format: HEAD ^${base}`
@@ -34,15 +35,15 @@ function getChanged(mergeBase: string = 'origin/master', argChanged?: Filename[]
   log('base', base)
   log('cmd', cmd)
 
-  const comitted = String(execSync(cmd))
+  const comitted = String(execSync(cmd, { cwd }))
     .trim()
     .split('\n')
     .filter((s) => s.length)
-  const changed = staged.concat(comitted).map((f) => path.resolve(f))
 
-  log('changed', changed)
+  const changed2 = staged.concat(comitted).map((f) => path.resolve(cwd, f))
+  log('changed2', changed2)
 
-  return changed.filter((f) => fs.existsSync(f))
+  return changed2.filter((f) => fs.existsSync(f))
 }
 
 function getTracked(cwd: string, argTracked?: Filename[]): Filename[] {
@@ -90,7 +91,7 @@ function getOptions(patternArg: string | Options, optionsArg?: Options): ROption
   log(`cwd`, options.cwd)
 
   // These operations are expensive, so, running them only for final options
-  const changed = getChanged(options.mergeBase, options.changed)
+  const changed = getChanged(options)
   const allTracked = getTracked(options.cwd, options.tracked).filter((f) => {
     // Filtering out all files with unsupported extensions
     return options.extensions.find((e) => f.endsWith(e))

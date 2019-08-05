@@ -1,6 +1,6 @@
 {
   "name": "affected-files",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "description": "Retrieves all files which affected in current git branch",
   "author": "Diokuz",
   "license": "MIT",
@@ -19,14 +19,14 @@
     "@types/debug": "^4.1.4",
     "@types/glob": "^7.1.1",
     "@types/jest": "^24.0.16",
-    "@types/node": "^12.6.8",
+    "@types/node": "^12.6.9",
     "debug": "^4.1.1",
     "jest": "^24.8.0",
     "prettier": "1.18.2",
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
-    "filter-dependent": "^2.0.1",
+    "filter-dependent": "^2.2.0",
     "minimatch": "^3.0.4"
   }
 }

@@ -51,7 +51,7 @@ All options are optional.
 
 | Option        | default           | description  |
 | ------------- |:------------- |:----- |
-| `pattern`      | `**/*` | Glob pattern of your source files. Could be defined either as a first argument, or as a _pattern_ property of option object, which became first argument in that case (getAffected(pattern, options) or getAffected({ pattern, ...options })are equal). |
+| `pattern`      | `**/*` | Glob pattern of your source files. |
 | `changed` | `git diff ...` | An array of changed files paths. By default it is evaluated from git diff relative to origin/master, but you could define custom _changed_ array. |
 | `usink` | `[]` | An array of glob patterns of files, which considered as [universal sink](https://en.wikipedia.org/wiki/Universal_vertex) in dependency graph. That means, every tracked file in your repo is dependent from every usink file. For example, you need to build full storybook every time you have affected something in `./.storybook`. Then just use `getAffected(pattern, { usink: '.storybook/*' })`. Note: every _usink_ must match _pattern_ |
 | `absolute` | `false` | If true, returns absolute paths of affected files, relative to options.cwd otherwise. |
@@ -59,6 +59,7 @@ All options are optional.
 | `mergeBase` | `origin/master` | Branch or revision which will be used to take a git diff. |
 | `tracked` | `git ls-tree ...` | An array of files, which would be used for dependency tree building. E.g. files in node_modules are not participating in dependency traversing. |
 | `dot` | `false` | If true, includes folders and files, starts with dot. |
+| `dontResolve` | `[]` | An array of strings, which should not be resolved. For example, in most cases there is no need to resolve `react`. Used for perfprmance optimization. |
 
 ## affected-files.config.js
 
