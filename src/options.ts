@@ -12,7 +12,6 @@ const DEFAULT_OPTIONS = {
   missing: [],
   dot: false,
   extensions: ['.js', '.jsx', '.ts', '.tsx'],
-  dontResolve: [],
 }
 
 const log = debug('af:opts')

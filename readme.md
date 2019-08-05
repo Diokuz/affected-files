@@ -59,7 +59,7 @@ All options are optional.
 | `mergeBase` | `origin/master` | Branch or revision which will be used to take a git diff. |
 | `tracked` | `git ls-tree ...` | An array of files, which would be used for dependency tree building. E.g. files in node_modules are not participating in dependency traversing. |
 | `dot` | `false` | If true, includes folders and files, starts with dot. |
-| `dontResolve` | `[]` | An array of strings, which should not be resolved. For example, in most cases there is no need to resolve `react`. Used for perfprmance optimization. |
+| `missing` | `[]` | An array of strings, which should not be resolved. For example, in most cases there is no need to resolve `react`. Used for perfprmance optimization. Also, it could be used in tuple form `filename.js ≥≥≥ ../dependency`, which disables `../dependency` resolving only in filename.js. |
 
 ## affected-files.config.js
 

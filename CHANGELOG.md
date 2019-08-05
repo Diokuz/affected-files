@@ -1,3 +1,8 @@
+## 3.3.0
+
+- Add `missing` option.
+- Remove options `externals` and `dontResolve`.
+
 ## 3.1.0
 
 - tracked files now filtered by 1) pattern 2) extensions → speed up `afiles`

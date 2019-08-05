@@ -86,7 +86,7 @@ function getAffectedFilesSync(options: ROptions): string[] {
 
   const affectedFiles = filterDependentSync(sources, changed, {
     onMiss: getOnMiss(options),
-    externals: options.dontResolve,
+    externals: options.missing,
   })
 
   log('affectedFiles', affectedFiles)
@@ -101,7 +101,7 @@ async function getAffectedFiles(options: ROptions): Promise<string[]> {
 
   const affectedFiles = await filterDependent(sources, changed, {
     onMiss: getOnMiss(options),
-    externals: options.dontResolve,
+    externals: options.missing,
   })
 
   plog(`end filterDependent`)
