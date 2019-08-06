@@ -23,8 +23,9 @@ async function run() {
   } else {
     const legend = '(' + CH + 'changed' + DE + ', ' + AF + 'affected only' + DE + ')'
     const changedRel = options.changed.map(f => f.replace(process.cwd() + '/', ''))
+    const affectedRel = affected.map(f => f.replace(process.cwd() + '/', ''))
     const changedRelSet = new Set(changedRel)
-    const coloredAffected = affected.map(a => {
+    const coloredAffected = affectedRel.map(a => {
       if (changedRelSet.has(a)) {
         return CH + a + DE
       }
@@ -36,7 +37,7 @@ async function run() {
       `affected files ${legend}:\n\n `,
       coloredAffected.join('\n  '),
       DE,
-      `\n\ntotal: ${affected.length}\n`
+      `\n\ntotal: ${affectedRel.length}\n`
     )
   }
 }

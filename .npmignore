@@ -8,3 +8,9 @@ bin/cli.d.ts
 bin/cli.ts
 bin/cli.d.js.map
 index.ts
+/1.js
+/__tests__
+/src/
+affected-files.config.js
+CHANGELOG.md
+README.md
