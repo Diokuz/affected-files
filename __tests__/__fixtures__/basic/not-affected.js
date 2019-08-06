@@ -1,1 +1,1 @@
-// not affected
+require('./not-modified')

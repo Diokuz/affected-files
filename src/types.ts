@@ -3,7 +3,8 @@ export type GlobPattern = string
 
 export interface Options {
   pattern?: string
-  changed?: Filename[]
+  changed?: Filename[] // deprecated
+  modified?: Filename[]
   abs?: boolean
   absolute?: boolean
   usink?: GlobPattern[]
@@ -16,7 +17,7 @@ export interface Options {
 
 export interface ROptions extends Options {
   sources: Filename[]
-  changed: Filename[]
+  modified: Filename[]
   tracked: Filename[]
   trackedSet: Set<string>
   allTracked: Filename[]

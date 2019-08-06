@@ -88,9 +88,9 @@ function getOnMiss({ missingSet, cwd }: ROptions) {
 }
 
 function getAffectedFilesSync(options: ROptions): string[] {
-  const { sources, changed } = options
+  const { sources, modified } = options
 
-  const affectedFiles = filterDependentSync(sources, changed, {
+  const affectedFiles = filterDependentSync(sources, modified, {
     onMiss: getOnMiss(options),
     externals: options.missing,
   })
@@ -103,11 +103,11 @@ function getAffectedFilesSync(options: ROptions): string[] {
 async function getAffectedFiles(
   options: ROptions
 ): Promise<{ options: ROptions; affected: string[] }> {
-  const { sources, changed } = options
+  const { sources, modified } = options
 
   plog(`start filterDependent`)
 
-  const affectedFiles = await filterDependent(sources, changed, {
+  const affectedFiles = await filterDependent(sources, modified, {
     onMiss: getOnMiss(options),
     externals: options.missing,
   })

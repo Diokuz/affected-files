@@ -1,3 +1,8 @@
+## 4.1.0
+
+- add `options.modified` alias for `options.changed`
+- CLI now accepts first argument as one `modified` file, not `pattern`
+
 ## 4.0.0
 
 - breaking: getAffected has only one argument now. Change `getAffected(pattern, options)` to `getAffected({ ...options, pattern })`.

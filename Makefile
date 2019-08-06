@@ -13,3 +13,6 @@ jest: clean
 
 tracked:
 	git ls-files
+
+untracked:
+	git ls-files --others --exclude-standard

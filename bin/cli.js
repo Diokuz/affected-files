@@ -2,12 +2,10 @@
 
 const getAffectedCli = require('../lib').getAffectedCli
 
-const pattern = process.argv[2] || '**/*'
+const modified = process.argv[2]
 
-console.log('pattern: ', pattern)
-
-if (pattern.length > 0 && pattern.indexOf('*') === -1) {
-  console.log('No asterisk found. Forgot to add quotes around pattern?')
+if (modified.length > 0) {
+  console.log('custom modified:', modified)
 }
 
 // https://misc.flogisoft.com/bash/tip_colors_and_formatting
@@ -16,17 +14,25 @@ const AF = '\033[0;31m' // red
 const DE = '\033[0;39m'
 
 async function run() {
-  const { options, affected } = await getAffectedCli({ pattern })
+  let result
+
+  if (modified) {
+    result = await getAffectedCli({ modified: [modified] })
+  } else {
+    result = await getAffectedCli()
+  }
+
+  const { options, affected } = result
 
   if (!affected.length) {
     console.log(`nothing found!`)
   } else {
-    const legend = '(' + CH + 'changed' + DE + ', ' + AF + 'affected only' + DE + ')'
-    const changedRel = options.changed.map(f => f.replace(process.cwd() + '/', ''))
+    const legend = '(' + CH + 'modified' + DE + ', ' + AF + 'affected only' + DE + ')'
+    const modifiedRel = options.modified.map(f => f.replace(process.cwd() + '/', ''))
     const affectedRel = affected.map(f => f.replace(process.cwd() + '/', ''))
-    const changedRelSet = new Set(changedRel)
+    const modifiedRelSet = new Set(modifiedRel)
     const coloredAffected = affectedRel.map(a => {
-      if (changedRelSet.has(a)) {
+      if (modifiedRelSet.has(a)) {
         return CH + a + DE
       }
 

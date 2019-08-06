@@ -1,3 +1,4 @@
+import fs from 'fs'
 import path from 'path'
 // @ts-ignore
 import getAffected, { getAffectedSync } from '../src'
@@ -10,8 +11,8 @@ describe('Basic', () => {
   const cwd = path.resolve(process.cwd(), fix[0], fix[1], fix[2])
 
   it('Must return affected files', () => {
-    const changed = [ path.resolve(cwd, 'changed.js') ]
-    const result = af({ changed, cwd })
+    const modified = [ path.resolve(cwd, 'changed.js') ]
+    const result = af({ modified, cwd })
     expect(result).toEqual([
       'affected.js',
       'changed.js',
@@ -19,8 +20,8 @@ describe('Basic', () => {
   })
 
   it('Must return affected files', async () => {
-    const changed = [ path.resolve(cwd, 'changed.js') ]
-    const result = await afa({ changed, cwd })
+    const modified = [ path.resolve(cwd, 'changed.js') ]
+    const result = await afa({ modified, cwd })
     expect(result).toEqual([
       'affected.js',
       'changed.js',
@@ -28,11 +29,11 @@ describe('Basic', () => {
   })
 
   it('Must return affected files abs paths', () => {
-    const changed = [
+    const modified = [
       path.resolve(cwd, 'changed.js')
     ]
 
-    const result = af({ changed, absolute: true, cwd })
+    const result = af({ modified, absolute: true, cwd })
     expect(result).toEqual([
       path.resolve(cwd, 'affected.js'),
       path.resolve(cwd, 'changed.js'),
@@ -40,12 +41,34 @@ describe('Basic', () => {
   })
 
   it('Must return affected files, options.pattern', () => {
-    const changed = [ path.resolve(cwd, 'changed.js') ]
-    const result = af({ pattern: 'cha*.js', changed, cwd })
+    const modified = [ path.resolve(cwd, 'changed.js') ]
+    const result = af({ pattern: 'cha*.js', modified, cwd })
     expect(result).toEqual([
       // 'affected.js',
       'changed.js',
     ])
+  })
+
+  describe('Untracked files', () => {
+    const untrackedFile = path.resolve(__dirname, '__fixtures__/basic/untracked.js')
+
+    beforeAll(() => {
+      fs.writeFileSync(untrackedFile, 'require("./changed")')
+    })
+
+    afterAll(() => {
+      fs.unlinkSync(untrackedFile)
+    })
+
+    it('Must account for untracked non-ignored files', () => {
+      const modified = [ path.resolve(cwd, 'changed.js') ]
+      const result = af({ modified, cwd })
+      expect(result).toEqual([
+        'affected.js',
+        'changed.js',
+        'untracked.js',
+      ])
+    })
   })
 })
 
@@ -53,10 +76,10 @@ describe('usink', () => {
   const fix = ['__tests__', '__fixtures__', 'usink']
   const cwd = path.resolve(process.cwd(), fix[0], fix[1], fix[2])
 
-  it('Must include all patterned files if usink is changed', () => {
+  it('Must include all patterned files if usink is modified', () => {
     const usink = ['a.js']
-    const changed = [path.resolve(cwd, 'a.js')]
-    const result = af({ changed, usink, cwd })
+    const modified = [path.resolve(cwd, 'a.js')]
+    const result = af({ modified, usink, cwd })
     expect(result).toEqual([
       'a.js',
       'foo/b.js',
@@ -65,8 +88,8 @@ describe('usink', () => {
 
   it('Must not include file with wrong extension', () => {
     const usink = ['a.js']
-    const changed = [path.resolve(cwd, 'a.js')]
-    const result = af({ changed, usink, cwd })
+    const modified = [path.resolve(cwd, 'a.js')]
+    const result = af({ modified, usink, cwd })
     expect(result).toEqual([
       'a.js',
       'foo/b.js',
@@ -76,17 +99,17 @@ describe('usink', () => {
 
   it('Must not throw when all usink are matched against pattern', () => {
     const usink = ['a.js']
-    expect(() => af({ changed: [], cwd, usink })).not.toThrow()
+    expect(() => af({ modified: [], cwd, usink })).not.toThrow()
   })
 
   it('Must throw when one usink not matched against pattern', () => {
     const usink = ['a.js']
-    expect(() => af({ pattern: 'foo/*.js', changed: [], cwd, usink })).toThrow()
+    expect(() => af({ pattern: 'foo/*.js', modified: [], cwd, usink })).toThrow()
   })
 
   it('Must not fail when usink is absolute path', () => {
     const usink = ['a.js']
-    expect(() => af({ changed: [], cwd, usink, absolute: true }))
+    expect(() => af({ modified: [], cwd, usink, absolute: true }))
       .not.toThrow()
   })
 })
@@ -96,8 +119,8 @@ describe('Config file', () => {
   const cwd = path.resolve(process.cwd(), fix[0], fix[1], fix[2])
 
   it('Must return affected files according to config-file pattern', () => {
-    const changed = [ path.resolve(cwd, 'x-changed.js') ]
-    const result = af({ changed, cwd })
+    const modified = [ path.resolve(cwd, 'x-changed.js') ]
+    const result = af({ modified, cwd })
     expect(result).toEqual([
       'x-affected.js',
       'x-changed.js',
@@ -105,8 +128,8 @@ describe('Config file', () => {
   })
 
   it('Must return affected files according to config-file pattern', async () => {
-    const changed = [ path.resolve(cwd, 'x-changed.js') ]
-    const result = await afa({ changed, cwd })
+    const modified = [ path.resolve(cwd, 'x-changed.js') ]
+    const result = await afa({ modified, cwd })
     expect(result).toEqual([
       'x-affected.js',
       'x-changed.js',
@@ -117,38 +140,38 @@ describe('Config file', () => {
 describe('options.missing', () => {
   const fix = ['__tests__', '__fixtures__', 'missing']
   const cwd = path.resolve(process.cwd(), fix[0], fix[1], fix[2])
-  const changed = [ path.resolve(cwd, 'changed.js') ]
+  const modified = [ path.resolve(cwd, 'changed.js') ]
 
   it('Must not fail if missing file is described', () => {
     const missing = [ 'affected.js >>> missing-library' ]
-    expect(() => af({ changed, cwd, missing })).not.toThrow()
+    expect(() => af({ modified, cwd, missing })).not.toThrow()
   })
 
   it('Must throw if missing filename is not matched', () => {
     const missing = [ 'foobar.js >>> missing-library' ]
-    expect(() => af({ changed, cwd, missing })).toThrow()
+    expect(() => af({ modified, cwd, missing })).toThrow()
   })
 
   it('Must not throw if filename is described as *', () => {
     const missing = [ '* >>> missing-library' ]
-    expect(() => af({ changed, cwd, missing })).not.toThrow()
+    expect(() => af({ modified, cwd, missing })).not.toThrow()
   })
 
   it('Must not throw if library is described as *', () => {
     const missing = [ 'affected.js >>> *' ]
-    expect(() => af({ changed, cwd, missing })).not.toThrow()
+    expect(() => af({ modified, cwd, missing })).not.toThrow()
   })
 
   it('Must not throw if wildcard', () => {
     const missing = [ '* >>> *' ]
-    expect(() => af({ changed, cwd, missing })).not.toThrow()
+    expect(() => af({ modified, cwd, missing })).not.toThrow()
   })
 })
 
 describe('options.tracked', () => {
   const fix = ['__tests__', '__fixtures__', 'gitignore']
   const cwd = path.resolve(process.cwd(), fix[0], fix[1], fix[2])
-  const changed = [ path.resolve(cwd, 'changed.js') ]
+  const modified = [ path.resolve(cwd, 'changed.js') ]
   const tracked = [
     path.resolve(cwd, 'changed.js'),
     path.resolve(cwd, 'affected.js'),
@@ -159,15 +182,15 @@ describe('options.tracked', () => {
   ]
 
   it('Must not include ignored files', () => {
-    const result = af({ changed, cwd, tracked })
+    const result = af({ modified, cwd, tracked })
 
     expect(result).toEqual(['changed.js', 'affected.js'])
   })
 
   it('Must not account for ignored (not tracked) usink', () => {
     const usink = ['ignored-usink.js']
-    const changed = [path.resolve(cwd, 'ignored-usink.js')]
-    const result = af({ changed, cwd, tracked, usink })
+    const modified = [path.resolve(cwd, 'ignored-usink.js')]
+    const result = af({ modified, cwd, tracked, usink })
     expect(result).toEqual([])
   })
 
@@ -177,14 +200,37 @@ describe('options.tracked', () => {
       ...tracked,
       path.resolve(cwd, 'ignored-usink.js'), // add ignored to tracked
     ]
-    const changed = [path.resolve(cwd, 'ignored-usink.js')]
-    const result = af({ changed, cwd, tracked: localTracked, usink })
+    const modified = [path.resolve(cwd, 'ignored-usink.js')]
+    const result = af({ modified, cwd, tracked: localTracked, usink })
     expect(result).toEqual(['changed.js', 'affected.js', 'not-affected.js', 'ignored-usink.js'])
   })
 
   it('Must account for affected (not changed) usink', () => {
     const usink = ['affected.js']
-    const result = af({ changed, cwd, tracked, usink })
+    const result = af({ modified, cwd, tracked, usink })
     expect(result).toEqual(['changed.js', 'affected.js', 'not-affected.js'])
+  })
+})
+
+describe('options.modified', () => {
+  const fix = ['__tests__', '__fixtures__', 'basic']
+  const cwd = path.resolve(process.cwd(), fix[0], fix[1], fix[2])
+
+  it('Must return files, affected only by custom modified', () => {
+    const modified1 = [ path.resolve(cwd, 'changed.js') ]
+    const modified2 = [ path.resolve(cwd, 'not-modified.js') ]
+    const result1 = af({ modified: modified1, cwd })
+    const result2 = af({ modified: modified2, cwd })
+    expect(result1).toEqual(['affected.js', 'changed.js'])
+    expect(result2).toEqual(['not-affected.js', 'not-modified.js'])
+  })
+
+  it('options.changed (deprecated)', () => {
+    const modified1 = [ path.resolve(cwd, 'changed.js') ]
+    const modified2 = [ path.resolve(cwd, 'not-modified.js') ]
+    const result1 = af({ changed: modified1, cwd })
+    const result2 = af({ changed: modified2, cwd })
+    expect(result1).toEqual(['affected.js', 'changed.js'])
+    expect(result2).toEqual(['not-affected.js', 'not-modified.js'])
   })
 })

@@ -16,10 +16,16 @@ const DEFAULT_OPTIONS = {
 
 const log = debug('af:opts')
 
-function getChanged({ mergeBase = 'origin/master', changed, cwd }: any): Filename[] {
-  if (changed) {
+type Arg = {
+  mergeBase?: string
+  modified?: string[]
+  cwd: string
+}
+
+function getModified({ mergeBase = 'origin/master', modified, cwd }: Arg): Filename[] {
+  if (modified) {
     // to abs path
-    return changed.map((f: string) => path.resolve(f))
+    return modified.map((f: string) => path.resolve(f))
   }
 
   const staged = String(execSync('git diff --name-only --pretty=format: HEAD', { cwd }))
@@ -39,26 +45,33 @@ function getChanged({ mergeBase = 'origin/master', changed, cwd }: any): Filenam
     .split('\n')
     .filter((s) => s.length)
 
-  const changed2 = staged.concat(comitted).map((f) => path.resolve(cwd, f))
-  log('changed2', changed2)
+  const retModified = staged.concat(comitted).map((f) => path.resolve(cwd, f))
+  log('retModified', retModified)
 
-  return changed2.filter((f) => fs.existsSync(f))
+  return retModified.filter((f) => fs.existsSync(f))
 }
 
-function getTracked(cwd: string, argTracked?: Filename[]): Filename[] {
-  let tracked = argTracked
+/**
+ * Returns an array of all files in a directory (recursively), except explicitly ignored by git
+ * @param cwd absolute path of directory where to search
+ * @param argTracked use custom tracked and dont use git
+ */
+function getGitFiles(cwd: string, customFiles?: Filename[]): Filename[] {
+  let gitFiles = customFiles
 
-  if (!tracked) {
-    tracked = String(execSync(`git ls-files`, { cwd }))
-      .trim()
+  if (!gitFiles) {
+    const tracked = String(execSync(`git ls-files`, { cwd })).trim()
+    const untracked = String(execSync(`git ls-files --others --exclude-standard`, { cwd })).trim()
+
+    gitFiles = (tracked + '\n' + untracked)
       .split('\n')
       .filter((s) => s.length)
       .map(absConvMap(true, cwd))
   }
 
-  log('tracked', tracked)
+  log('git files', gitFiles)
 
-  return tracked.filter((f) => fs.existsSync(f))
+  return gitFiles.filter((f) => fs.existsSync(f))
 }
 
 function getOptions(apiOptions: Options): ROptions {
@@ -74,17 +87,23 @@ function getOptions(apiOptions: Options): ROptions {
     log(`No config file detected`)
   }
 
-  options = { ...DEFAULT_OPTIONS, ...fileOptions, ...apiOptions }
+  options = { ...DEFAULT_OPTIONS, ...fileOptions, ...apiOptions } as ROptions
+
+  if (options.changed) {
+    console.warn(`options.changed is deprecated, use options.modified instead`)
+    options.modified = options.changed
+    delete options.changed
+  }
 
   log(`cwd`, options.cwd)
 
   // These operations are expensive, so, running them only for final options
-  const changed = getChanged(options)
-  const allTracked = getTracked(options.cwd, options.tracked).filter((f) => {
+  const modified = getModified(options)
+  const allTracked = getGitFiles(options.cwd, options.tracked).filter((f) => {
     // Filtering out all files with unsupported extensions
     return options.extensions.find((e) => f.endsWith(e))
   })
-  const result = { ...options, changed, allTracked } as ROptions
+  const result = { ...options, modified, allTracked } as ROptions
 
   const tracked = filterByPattern(allTracked, result.pattern, { cwd: result.cwd, dot: result.dot })
   const trackedSet = new Set(tracked)
@@ -99,8 +118,8 @@ function getOptions(apiOptions: Options): ROptions {
 
   result.missingSet = new Set(result.missing)
 
-  if (result.changed) {
-    log('custom changed detected', result.changed)
+  if (result.modified) {
+    log('custom modified detected', result.modified)
   }
 
   return result
