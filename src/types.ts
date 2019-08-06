@@ -7,7 +7,6 @@ export interface Options {
   abs?: boolean
   absolute?: boolean
   usink?: GlobPattern[]
-  superleaves?: GlobPattern[] // deprecated
   cwd?: string
   missing?: string[]
   mergeBase?: string

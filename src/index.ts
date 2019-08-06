@@ -7,13 +7,16 @@ import { Options, ROptions, GlobPattern } from './types'
 const log = debug('af')
 const plog = debug('af:profiler')
 
-export function getAffectedSync(patternArg: string | Options, optionsArg?: Options) {
-  const options: ROptions = getOptions(patternArg, optionsArg)
+export function getAffectedSync(optionsArg: Options = {}) {
+  const options: ROptions = getOptions(optionsArg)
 
   return getAffectedFilesSync(options)
 }
 
-function postprocess(affectedFiles: string[], options: ROptions): string[] {
+function postprocess(
+  affectedFiles: string[],
+  options: ROptions
+): { options: ROptions; affected: string[] } {
   const { pattern, allTracked, sources, absolute, dot, cwd } = options
 
   if (typeof options.usink !== 'undefined') {
@@ -46,7 +49,7 @@ function postprocess(affectedFiles: string[], options: ROptions): string[] {
       if (affectedSet.has(fn)) {
         log(`usink file "${fn}" is affected, returning all sources files`)
 
-        return absConv(sources, absolute, cwd)
+        return { options, affected: absConv(sources, absolute, cwd) }
       }
     }
 
@@ -54,11 +57,14 @@ function postprocess(affectedFiles: string[], options: ROptions): string[] {
   }
 
   if (absolute === true) {
-    return affectedFiles
+    return { options, affected: affectedFiles }
   }
 
-  // /abs/path/to/cwd/folder/1.js → folder/1.js
-  return affectedFiles.map((f: string) => f.slice(cwd.length + 1))
+  return {
+    options,
+    // /abs/path/to/cwd/folder/1.js → folder/1.js
+    affected: affectedFiles.map((f: string) => f.slice(cwd.length + 1)),
+  }
 }
 
 function getOnMiss({ missingSet, cwd }: ROptions) {
@@ -91,10 +97,12 @@ function getAffectedFilesSync(options: ROptions): string[] {
 
   log('affectedFiles', affectedFiles)
 
-  return postprocess(affectedFiles, options)
+  return postprocess(affectedFiles, options).affected
 }
 
-async function getAffectedFiles(options: ROptions): Promise<string[]> {
+async function getAffectedFiles(
+  options: ROptions
+): Promise<{ options: ROptions; affected: string[] }> {
   const { sources, changed } = options
 
   plog(`start filterDependent`)
@@ -111,8 +119,15 @@ async function getAffectedFiles(options: ROptions): Promise<string[]> {
   return postprocess(affectedFiles, options)
 }
 
-export async function getAffected(patternArg: string | Options, optionsArg?: Options) {
-  const options: ROptions = getOptions(patternArg, optionsArg)
+export async function getAffected(optionsArg: Options = {}) {
+  const options: ROptions = getOptions(optionsArg)
+  const result = await getAffectedFiles(options)
+
+  return result.affected
+}
+
+export async function getAffectedCli(optionsArg: Options = {}) {
+  const options: ROptions = getOptions(optionsArg)
 
   return getAffectedFiles(options)
 }

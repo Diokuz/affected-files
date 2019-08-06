@@ -1,6 +1,6 @@
 {
   "name": "affected-files",
-  "version": "3.3.0",
+  "version": "4.0.0",
   "description": "Retrieves all files which affected in current git branch",
   "author": "Diokuz",
   "license": "MIT",
@@ -10,7 +10,8 @@
     "url": "git://github.com/diokuz/affected-files.git"
   },
   "bin": {
-    "afiles": "./bin/cli.js"
+    "afiles": "./bin/cli.js",
+    "affected-files": "./bin/cli.js"
   },
   "scripts": {
     "afiles": "./bin/cli.js"

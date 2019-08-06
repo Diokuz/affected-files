@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const getAffectedFiles = require('../lib').default
+const getAffectedCli = require('../lib').getAffectedCli
 
 const pattern = process.argv[2] || '**/*'
 
@@ -10,17 +10,39 @@ if (pattern.length > 0 && pattern.indexOf('*') === -1) {
   console.log('No asterisk found. Forgot to add quotes around pattern?')
 }
 
+// https://misc.flogisoft.com/bash/tip_colors_and_formatting
+const CH = '\033[0;32m' // green
+const AF = '\033[0;31m' // red
+const DE = '\033[0;39m'
+
 async function run() {
-  const files = await getAffectedFiles(pattern)
-  
-  if (!files.length) {
-    console.log(`Nothing found!`)
+  const { options, affected } = await getAffectedCli({ pattern })
+
+  if (!affected.length) {
+    console.log(`nothing found!`)
   } else {
-    console.log('Affected files:\n\n', files.join('\n'), `\n\ntotal: ${files.length}`)
+    const legend = '(' + CH + 'changed' + DE + ', ' + AF + 'affected only' + DE + ')'
+    const changedRel = options.changed.map(f => f.replace(process.cwd() + '/', ''))
+    const changedRelSet = new Set(changedRel)
+    const coloredAffected = affected.map(a => {
+      if (changedRelSet.has(a)) {
+        return CH + a + DE
+      }
+
+      return AF + a + DE
+    })
+
+    console.log(
+      `affected files ${legend}:\n\n `,
+      coloredAffected.join('\n  '),
+      DE,
+      `\n\ntotal: ${affected.length}\n`
+    )
   }
 }
 
 run().catch(e => {
   process.exitCode = 1
+  console.error(e.message)
   console.error(`failed to get affected files`)
 })

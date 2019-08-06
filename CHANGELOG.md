@@ -1,3 +1,9 @@
+## 4.0.0
+
+- breaking: getAffected has only one argument now. Change `getAffected(pattern, options)` to `getAffected({ ...options, pattern })`.
+- breaking: remove option `superleaves` in flavour of option `usink`
+- better colorful cli
+
 ## 3.3.0
 
 - Add `missing` option.

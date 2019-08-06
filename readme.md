@@ -1,20 +1,27 @@
 <h1 align="center">Affected files</h1>
 
-Returns a list of files, which affected in current branch compared to target branch (origin/master by default).
+Returns a list of js/ts(x) files, which _affected_ in current branch compared to _mergeBase_ (origin/master by default).
 
 ## CLI
 
 ```sh
+$ npm run afiles
+// or
 $ yarn afiles
 
 pattern:  **/*
-Affected files:
+Affected files: (changed, affected)
 
-a.js
-dependent-from-a.js
-dependent-from--dependent-from-a.js
+  __tests__/common.spec.ts
+  affected-files.config.js
+  bin/cli.js
+  src/index.ts
+  src/options.ts
+  src/types.ts
 
-total: 3
+total: 6
+
+Done in 0.82s.
 ```
 
 ## Explanation
@@ -63,7 +70,7 @@ All options are optional.
 
 ## affected-files.config.js
 
-Place this file in cwd, and export your options.
+Place this file in the project root folder (cwd), and export your options.
 
 ## Using in CI
 

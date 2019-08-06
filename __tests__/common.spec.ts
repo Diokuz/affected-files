@@ -76,17 +76,17 @@ describe('usink', () => {
 
   it('Must not throw when all usink are matched against pattern', () => {
     const usink = ['a.js']
-    expect(() => af('**/*.js', { changed: [], cwd, usink })).not.toThrow()
+    expect(() => af({ changed: [], cwd, usink })).not.toThrow()
   })
 
   it('Must throw when one usink not matched against pattern', () => {
     const usink = ['a.js']
-    expect(() => af('foo/*.js', { changed: [], cwd, usink })).toThrow()
+    expect(() => af({ pattern: 'foo/*.js', changed: [], cwd, usink })).toThrow()
   })
 
   it('Must not fail when usink is absolute path', () => {
     const usink = ['a.js']
-    expect(() => af('**/*.js', { changed: [], cwd, usink, absolute: true }))
+    expect(() => af({ changed: [], cwd, usink, absolute: true }))
       .not.toThrow()
   })
 })

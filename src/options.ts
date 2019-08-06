@@ -5,8 +5,8 @@ import minimatch from 'minimatch'
 import { Options, ROptions, Filename } from './types'
 import debug from 'debug'
 
-export const DEFAULT_PATTERN = '**/*'
 const DEFAULT_OPTIONS = {
+  pattern: '**/*',
   absolute: false,
   cwd: process.cwd(),
   missing: [],
@@ -61,19 +61,8 @@ function getTracked(cwd: string, argTracked?: Filename[]): Filename[] {
   return tracked.filter((f) => fs.existsSync(f))
 }
 
-function getOptions(patternArg: string | Options, optionsArg?: Options): ROptions {
-  let pattern = DEFAULT_PATTERN
-  let realOptionsArg = optionsArg
-
-  if (typeof patternArg === 'object') {
-    realOptionsArg = patternArg
-    pattern = patternArg.pattern || DEFAULT_PATTERN
-  } else {
-    pattern = patternArg
-  }
-
-  let options = { pattern, ...DEFAULT_OPTIONS, ...realOptionsArg }
-
+function getOptions(apiOptions: Options): ROptions {
+  let options = { ...DEFAULT_OPTIONS, ...apiOptions }
   let fileOptions: Options = {}
 
   try {
@@ -85,7 +74,7 @@ function getOptions(patternArg: string | Options, optionsArg?: Options): ROption
     log(`No config file detected`)
   }
 
-  options = { pattern, ...DEFAULT_OPTIONS, ...fileOptions, ...realOptionsArg }
+  options = { ...DEFAULT_OPTIONS, ...fileOptions, ...apiOptions }
 
   log(`cwd`, options.cwd)
 
@@ -102,19 +91,6 @@ function getOptions(patternArg: string | Options, optionsArg?: Options): ROption
 
   result.tracked = tracked
   result.trackedSet = trackedSet
-
-  if (result.superleaves) {
-    console.warn('deprecated options.superleaves detected, use options.usink instead')
-
-    if (result.usink) {
-      throw new Error(
-        `Cannot operate both: with options.superleaves and options.sink! Use only options.sink.`
-      )
-    }
-
-    result.usink = result.superleaves
-  }
-
   result.sources = filterByPattern(tracked, result.pattern, { cwd: result.cwd, dot: result.dot })
 
   log('tracked', result.tracked)
