@@ -4,7 +4,7 @@ const getAffectedCli = require('../lib').getAffectedCli
 
 const modified = process.argv[2]
 
-if (modified.length > 0) {
+if (modified && modified.length > 0) {
   console.log('custom modified:', modified)
 }
 
