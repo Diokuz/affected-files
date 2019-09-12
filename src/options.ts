@@ -3,7 +3,7 @@ import path from 'path'
 import { execSync } from 'child_process'
 import minimatch from 'minimatch'
 import { Options, ROptions, Filename } from './types'
-import { pathToUnixPath } from 'filter-dependent/lib/utils'
+import { pathToUnixPath } from './utils'
 import debug from 'debug'
 
 const DEFAULT_OPTIONS = {

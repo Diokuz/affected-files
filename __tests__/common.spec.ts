@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 // @ts-ignore
 import getAffected, { getAffectedSync } from '../src'
-import { pathToUnixPath } from 'filter-dependent/lib/utils'
+import { pathToUnixPath } from '../src/utils'
 
 const af = getAffectedSync
 const afa = getAffected
