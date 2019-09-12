@@ -36,7 +36,7 @@ function getModified({ mergeBase = 'origin/master', modified, cwd }: Arg): Filen
   const base = execSync(`git merge-base ${mergeBase} HEAD`, { cwd })
     .toString()
     .trim()
-  const cmd = `git log --name-only --pretty=format: HEAD ^${base}`
+  const cmd = `git log --name-only --pretty=format: HEAD ${base}..HEAD`
 
   log('base', base)
   log('cmd', cmd)
