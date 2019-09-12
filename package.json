@@ -1,6 +1,6 @@
 {
   "name": "affected-files",
-  "version": "4.1.1",
+  "version": "4.1.2",
   "description": "Retrieves all files which affected in current git branch",
   "author": "Diokuz",
   "license": "MIT",
@@ -17,17 +17,17 @@
     "afiles": "./bin/cli.js"
   },
   "devDependencies": {
-    "@types/debug": "^4.1.4",
+    "@types/debug": "^4.1.5",
     "@types/glob": "^7.1.1",
-    "@types/jest": "^24.0.16",
-    "@types/node": "^12.6.9",
+    "@types/jest": "^24.0.18",
+    "@types/node": "^12.7.5",
     "debug": "^4.1.1",
-    "jest": "^24.8.0",
+    "jest": "^24.9.0",
     "prettier": "1.18.2",
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
-    "filter-dependent": "^2.2.0",
+    "filter-dependent": "^2.2.1",
     "minimatch": "^3.0.4"
   }
 }

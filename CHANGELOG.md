@@ -1,3 +1,7 @@
+## 4.1.2
+
+- Windows support
+
 ## 4.1.0
 
 - add `options.modified` alias for `options.changed`
