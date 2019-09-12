@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const getAffectedCli = require('../lib').getAffectedCli
+const pathToUnixPath = require('../lib/utils').pathToUnixPath
 
 const modified = process.argv[2]
 
@@ -27,9 +28,10 @@ async function run() {
   if (!affected.length) {
     console.log(`nothing found!`)
   } else {
+    const cwd = pathToUnixPath(process.cwd())
     const legend = '(' + CH + 'modified' + DE + ', ' + AF + 'affected only' + DE + ')'
-    const modifiedRel = options.modified.map(f => f.replace(process.cwd() + '/', ''))
-    const affectedRel = affected.map(f => f.replace(process.cwd() + '/', ''))
+    const modifiedRel = options.modified.map(f => f.replace(cwd + '/', ''))
+    const affectedRel = affected.map(f => f.replace(cwd + '/', ''))
     const modifiedRelSet = new Set(modifiedRel)
     const coloredAffected = affectedRel.map(a => {
       if (modifiedRelSet.has(a)) {

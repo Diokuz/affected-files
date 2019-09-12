@@ -3,12 +3,13 @@ import path from 'path'
 import { execSync } from 'child_process'
 import minimatch from 'minimatch'
 import { Options, ROptions, Filename } from './types'
+import { pathToUnixPath } from './utils'
 import debug from 'debug'
 
 const DEFAULT_OPTIONS = {
   pattern: '**/*',
   absolute: false,
-  cwd: process.cwd(),
+  cwd: pathToUnixPath(process.cwd()),
   missing: [],
   dot: false,
   extensions: ['.js', '.jsx', '.ts', '.tsx'],
@@ -25,7 +26,7 @@ type Arg = {
 function getModified({ mergeBase = 'origin/master', modified, cwd }: Arg): Filename[] {
   if (modified) {
     // to abs path
-    return modified.map((f: string) => path.resolve(f))
+    return modified.map((f: string) => pathToUnixPath(path.resolve(f)))
   }
 
   const staged = String(execSync('git diff --name-only --pretty=format: HEAD', { cwd }))
@@ -45,7 +46,7 @@ function getModified({ mergeBase = 'origin/master', modified, cwd }: Arg): Filen
     .split('\n')
     .filter((s) => s.length)
 
-  const retModified = staged.concat(comitted).map((f) => path.resolve(cwd, f))
+  const retModified = staged.concat(comitted).map((f) => pathToUnixPath(path.resolve(cwd, f)))
   log('retModified', retModified)
 
   return retModified.filter((f) => fs.existsSync(f))
@@ -77,9 +78,8 @@ function getGitFiles(cwd: string, customFiles?: Filename[]): Filename[] {
 function getOptions(apiOptions: Options): ROptions {
   let options = { ...DEFAULT_OPTIONS, ...apiOptions }
   let fileOptions: Options = {}
-
   try {
-    const fn = path.resolve(options.cwd as string, 'affected-files.config.js')
+    const fn = pathToUnixPath(path.resolve(options.cwd as string, 'affected-files.config.js'))
 
     fileOptions = require(fn)
     log(`File config found`, fn, fileOptions)
@@ -129,10 +129,11 @@ export default getOptions
 
 export function absConvMap(absolute: boolean, cwd: string) {
   return (f: Filename) => {
-    if (f.startsWith('/') && !absolute) {
+    const isAbsolutePath = pathToUnixPath(f) === pathToUnixPath(path.resolve(cwd, f))
+    if (isAbsolutePath && !absolute) {
       return f.slice(cwd.length + 1)
-    } else if (!f.startsWith('/') && absolute) {
-      return path.resolve(cwd, f)
+    } else if (!isAbsolutePath && absolute) {
+      return pathToUnixPath(path.resolve(cwd, f))
     }
 
     return f
