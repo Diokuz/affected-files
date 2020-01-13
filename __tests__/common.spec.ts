@@ -213,3 +213,13 @@ describe('options.modified', () => {
     expect(result2).toEqual(['not-affected.js', 'not-modified.js'])
   })
 })
+
+describe('options.pmodified', () => {
+  const cwd = path.resolve(process.cwd(), '__tests__', '__fixtures__', 'basic')
+  const pmodified = [path.resolve(cwd, 'not-modified.js')]
+
+  it('Must return `pmodified` files as modified even when not really', () => {
+    const result = af({ modified: [], pmodified, cwd })
+    expect(result).toEqual(['not-affected.js', 'not-modified.js'])
+  })
+})

@@ -1,3 +1,7 @@
+## 4.2
+
+- Add options.pmodified – an array of permanently modified files
+
 ## 4.1.4
 
 - Windows support

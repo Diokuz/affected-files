@@ -66,6 +66,7 @@ All options are optional.
 | `tracked` | `git ls-tree ...` | An array of files, which would be used for dependency tree building. E.g. files in node_modules are not participating in dependency traversing. Note: by default untracked but non-ignored files are included. |
 | `absolute` | `false` | If true, returns absolute paths of affected files, relative to options.cwd otherwise. |
 | `dot` | `false` | If true, includes folders and files, starts with dot. |
+| `pmodified` | `[]` | Permanently modified files. An array of filenames, which must be considered as modified. Note: files, dependent from _pmodified_-files, will be also considered as _affected_ permanently. Also, _pmodified_-files are taken only from _tracked_-files. |
 
 ## affected-files.config.js
 

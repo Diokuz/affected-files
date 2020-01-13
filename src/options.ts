@@ -13,6 +13,7 @@ const DEFAULT_OPTIONS = {
   missing: [],
   dot: false,
   extensions: ['.js', '.jsx', '.ts', '.tsx'],
+  pmodified: [],
 }
 
 const log = debug('af:opts')
@@ -20,36 +21,48 @@ const log = debug('af:opts')
 type Arg = {
   mergeBase?: string
   modified?: string[]
+  pmodified?: string[]
   cwd: string
 }
 
-function getModified({ mergeBase = 'origin/master', modified, cwd }: Arg): Filename[] {
+function getModified({
+  mergeBase = 'origin/master',
+  modified,
+  pmodified = [],
+  cwd,
+}: Arg): Filename[] {
+  let mods
+
   if (modified) {
     // to abs path
-    return modified.map((f: string) => pathToUnixPath(path.resolve(f)))
+    mods = modified
+  } else {
+    const staged = String(execSync('git diff --name-only --pretty=format: HEAD', { cwd }))
+      .trim()
+      .split('\n')
+      .filter((s) => s.length)
+    const base = execSync(`git merge-base ${mergeBase} HEAD`, { cwd })
+      .toString()
+      .trim()
+    const cmd = `git log --name-only --pretty=format: HEAD ${base}..HEAD`
+
+    log('base', base)
+    log('cmd', cmd)
+
+    const comitted = String(execSync(cmd, { cwd }))
+      .trim()
+      .split('\n')
+      .filter((s) => s.length)
+
+    mods = staged.concat(comitted)
   }
 
-  const staged = String(execSync('git diff --name-only --pretty=format: HEAD', { cwd }))
-    .trim()
-    .split('\n')
-    .filter((s) => s.length)
-  const base = execSync(`git merge-base ${mergeBase} HEAD`, { cwd })
-    .toString()
-    .trim()
-  const cmd = `git log --name-only --pretty=format: HEAD ${base}..HEAD`
+  log('mods', mods)
 
-  log('base', base)
-  log('cmd', cmd)
-
-  const comitted = String(execSync(cmd, { cwd }))
-    .trim()
-    .split('\n')
-    .filter((s) => s.length)
-
-  const retModified = staged.concat(comitted).map((f) => pathToUnixPath(path.resolve(cwd, f)))
-  log('retModified', retModified)
-
-  return retModified.filter((f) => fs.existsSync(f))
+  return mods
+    .concat(pmodified)
+    .map((f) => pathToUnixPath(path.resolve(cwd, f)))
+    .filter((f) => fs.existsSync(f))
 }
 
 /**

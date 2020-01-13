@@ -13,6 +13,7 @@ export interface Options {
   mergeBase?: string
   tracked?: Filename[]
   dot?: boolean
+  pmodified?: Filename[]
 }
 
 export interface ROptions extends Options {
@@ -28,4 +29,5 @@ export interface ROptions extends Options {
   absolute: boolean
   dot: boolean
   extensions: string[]
+  pmodified: Filename[]
 }
