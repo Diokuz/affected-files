@@ -38,7 +38,9 @@ function getModified({
     // to abs path
     mods = modified
   } else {
-    const staged = String(execSync('git diff --name-only --pretty=format: HEAD', { cwd, maxBuffer }))
+    const staged = String(
+      execSync('git diff --name-only --pretty=format: HEAD', { cwd, maxBuffer })
+    )
       .trim()
       .split('\n')
       .filter((s) => s.length)
@@ -76,7 +78,9 @@ function getGitFiles(cwd: string, customFiles?: Filename[]): Filename[] {
 
   if (!gitFiles) {
     const tracked = String(execSync(`git ls-files`, { cwd, maxBuffer })).trim()
-    const untracked = String(execSync(`git ls-files --others --exclude-standard`, { cwd, maxBuffer })).trim()
+    const untracked = String(
+      execSync(`git ls-files --others --exclude-standard`, { cwd, maxBuffer })
+    ).trim()
 
     gitFiles = (tracked + '\n' + untracked)
       .split('\n')

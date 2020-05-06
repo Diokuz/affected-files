@@ -1,3 +1,7 @@
+## 4.2.1
+
+- Increase maxBuffer for child process
+
 ## 4.2
 
 - Add options.pmodified – an array of permanently modified files
