@@ -17,6 +17,7 @@ const DEFAULT_OPTIONS = {
 }
 
 const log = debug('af:opts')
+const maxBuffer = 64 * 1024 * 1024
 
 type Arg = {
   mergeBase?: string
@@ -37,11 +38,11 @@ function getModified({
     // to abs path
     mods = modified
   } else {
-    const staged = String(execSync('git diff --name-only --pretty=format: HEAD', { cwd }))
+    const staged = String(execSync('git diff --name-only --pretty=format: HEAD', { cwd, maxBuffer }))
       .trim()
       .split('\n')
       .filter((s) => s.length)
-    const base = execSync(`git merge-base ${mergeBase} HEAD`, { cwd })
+    const base = execSync(`git merge-base ${mergeBase} HEAD`, { cwd, maxBuffer })
       .toString()
       .trim()
     const cmd = `git log --name-only --pretty=format: HEAD ${base}..HEAD`
@@ -49,7 +50,7 @@ function getModified({
     log('base', base)
     log('cmd', cmd)
 
-    const comitted = String(execSync(cmd, { cwd }))
+    const comitted = String(execSync(cmd, { cwd, maxBuffer }))
       .trim()
       .split('\n')
       .filter((s) => s.length)
@@ -74,8 +75,8 @@ function getGitFiles(cwd: string, customFiles?: Filename[]): Filename[] {
   let gitFiles = customFiles
 
   if (!gitFiles) {
-    const tracked = String(execSync(`git ls-files`, { cwd })).trim()
-    const untracked = String(execSync(`git ls-files --others --exclude-standard`, { cwd })).trim()
+    const tracked = String(execSync(`git ls-files`, { cwd, maxBuffer })).trim()
+    const untracked = String(execSync(`git ls-files --others --exclude-standard`, { cwd, maxBuffer })).trim()
 
     gitFiles = (tracked + '\n' + untracked)
       .split('\n')
