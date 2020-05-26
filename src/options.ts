@@ -44,9 +44,7 @@ function getModified({
       .trim()
       .split('\n')
       .filter((s) => s.length)
-    const base = execSync(`git merge-base ${mergeBase} HEAD`, { cwd, maxBuffer })
-      .toString()
-      .trim()
+    const base = execSync(`git merge-base ${mergeBase} HEAD`, { cwd, maxBuffer }).toString().trim()
     const cmd = `git log --name-only --pretty=format: HEAD ${base}..HEAD`
 
     log('base', base)
